@@ -82,6 +82,13 @@ class App(Tk):
         self.menu_tools.add_command(label='Cancel')
         
     def insertion(self):
+        """
+        1 - open file broweser
+        2 - insert file name in file_list
+        3 - set text in label
+        
+        return None
+        """
         name, content , directory = openFileOrFolder('file')
         self.title(f'{directory} - magic-text')
         self.file_list.insert(END, name)       
