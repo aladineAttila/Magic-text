@@ -13,7 +13,7 @@ def popup(content):
     Entry(frame, textvariable=file_name).pack(side='left')
     def entre(file_name):
         with open(f"{file_name}", 'w') as text:
-            if file_name != 'nothing':
+            if file_name != 'nothing' or file_name != "" or file_name != " ":
                 text.write(content)
                 app.destroy()
     Button(frame, text='entre', command=lambda:(entre(file_name.get()))).pack(side='right')
