@@ -72,7 +72,8 @@ class App(Tk):
         # preference
         self.menu_theme = Menu(self.menu_preference, tearoff=0)
         self.menu_preference.add_cascade(label='theme', menu=self.menu_theme)
-        font_tuple = font.families()
+        # font_tuple = font.families()
+        font_tuple = ("Comic Sans MS","Courier New")
         for font_family in font_tuple:
             self.menu_theme.add_command(label=font_family,
                     command=lambda:(self.text.configure(font=(font_family, 14))))
