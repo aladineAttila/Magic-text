@@ -2,7 +2,7 @@
 from tkinter import Tk
 from tkinter import (Frame, Text, Listbox, 
         Entry, Button, StringVar, END,
-        Menu, Label
+        Menu, Label, font
         )
 # import action button
 from package.action import saveFile, openFileOrFolder
@@ -32,7 +32,7 @@ class App(Tk):
             self.text.get(1.0,END),self.file_name.get()
             )))
         self.menu_file.add_command(label='open file Ctrl+O',command=self.insertion)
-        self.menu_file.add_command(label='open folder',)
+        #self.menu_file.add_command(label='open folder',)
         
         # menu view
         self.menu_view.add_command(label='split verticat')
@@ -40,14 +40,17 @@ class App(Tk):
         #self.menu_view.add_command(label="show terminal Ctrl+'", command=self.showTerminal)
         #self.menu_view.add_command(label='hide terminal', )
         
-        
-
         # menu preference
         self.theme = Menu(self.menu_preference, tearoff=0)
         self.menu_preference.add_cascade(label='theme', menu=self.theme)
         self.theme.add_command(label='monokai')
         self.theme.add_command(label='maria')
-        self.menu_preference.add_command(label='setting')
+        
+        self.font_menu = Menu(self.menu_preference, tearoff=0)
+        self.menu_preference.add_cascade(label='setting', menu=self.font_menu)
+        self.font_list = Menu(self.font_menu, tearoff=0)
+        self.font_menu.add_cascade(label='font', menu=self.font_list)
+        self.add_font_menu()
         self.config(menu=self.menu)
         
         # Text editor
@@ -87,6 +90,13 @@ class App(Tk):
         self.file_list.insert(END, name)       
         self.text.insert(END, content)
         self.file_name.set(name)
+    
+    def add_font_menu(self):
+        font_tuple = font.families()
+        for font_ in font_tuple:
+            self.font_list.add_command(label=f'{font_}',)
+
+
 
 
 if __name__ == "__main__":
