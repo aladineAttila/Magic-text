@@ -5,8 +5,7 @@ from tkinter import (Frame, Text, Listbox,
         Menu, Label, font
         )
 # import action button
-from package.action import saveFile, openFileOrFolder
-from package.python_shell import PythonShell
+from package.action import saveFile, openFileOrFolder, PythonShell
 
 
 class App(Tk):
@@ -14,6 +13,9 @@ class App(Tk):
         Tk.__init__(self)
         self.title('magic-text')
         self.geometry("1000x800")
+        
+        self.dic = {}
+        self.file_active_now = None
         
         # Text editor
         self.frame = Frame(self, bg='#1E201C')
@@ -27,26 +29,26 @@ class App(Tk):
         self.right = Frame(self.frame, bg='#1E201C')
         self.frame_top_right = Frame(self.right, bg='#1E201C')
         self.file_name = StringVar()
-        self.label = Button(self.frame_top_right, bg='#262626', fg='#5A5C58', textvariable=self.file_name)
-        self.file_name.set('nothing')
-        self.label.pack(side='left')
+        #self.label = Button(self.frame_top_right, bg='#262626', fg='#5A5C58', textvariable=self.file_name)
+        #self.file_name.set('nothing')
+        #self.label.pack(side='left')
         
         self.frame_top_right.pack(fill="x")
         self.text = Text(self.right, bg='#2C2E28', fg='#FFFFFF', width=800, height=31)
         self.text.pack(side='top', fill='y', expand=1)
-        self.text.configure(font=('Courier New', 14))
+        self.text.configure(font=('Courier New', 11))
         self.text_in_terminal = StringVar()
         self.terminal = Entry(self.right, bg='#1E201C', fg='#FFFFFF', font=('Courier New', 14),textvariable=self.text_in_terminal)
-        self.terminal.pack(side='bottom', fill='x', ipady=35)
+        
         self.right.pack(side='right', fill='y')
         
         self.frame.pack(fill='x')
         
         self.menu = Menu(self, bg='#1E201C', fg='white') # menu base
-        self.menu_file = Menu(self.menu, tearoff=0)
-        self.menu_view = Menu(self.menu, tearoff=0)
-        self.menu_preference = Menu(self.menu, tearoff=0)
-        self.menu_tools = Menu(self.menu, tearoff=0)
+        self.menu_file = Menu(self.menu, bg='#1E201C', fg='white', tearoff=0)
+        self.menu_view = Menu(self.menu, bg='#1E201C', fg='white', tearoff=0)
+        self.menu_preference = Menu(self.menu, bg='#1E201C', fg='white', tearoff=0)
+        self.menu_tools = Menu(self.menu, bg='#1E201C', fg='white', tearoff=0)
         
         # add menu file into menu
         self.menu.add_cascade(label='file', menu=self.menu_file)
@@ -55,37 +57,67 @@ class App(Tk):
         self.menu.add_cascade(label='preference', menu=self.menu_preference)
 
         # menu file
-        self.menu_file.add_command(label='save Ctrl+S', command=lambda:(saveFile(
-            self.text.get(1.0,END),self.file_name.get()
-            )))
+        self.menu_file.add_command(label='save Ctrl+S', 
+                command=lambda:(
+                    saveFile(self.text.get(1.0,END),self.file_active_now)
+                ))
         self.menu_file.add_command(label='open file Ctrl+O',command=self.insertion)
+        self.menu_file.add_command(label='quit', command=self.quit)
         
         # menu view
-        self.menu_view.add_command(label="show terminal Ctrl+'", )
-        self.menu_view.add_command(label='hide terminal', )
+        self.menu_view.add_command(label="show terminal Ctrl+'", command=lambda:self.hideAndShowTerminal('show'))
+        self.menu_view.add_command(label='hide terminal', command=lambda:self.hideAndShowTerminal('hide'))
                 
         # menu tools
         self.pythonshell = PythonShell(self.text, self.text_in_terminal)
-        self.menu_tools.add_command(label='build Ctrl+B', command=self.pythonshell.get_text)
-        self.menu_tools.add_command(label='Cancel')
+        self.menu_tools.add_command(label='build Ctrl+B', 
+                command=lambda:(
+                    self.pythonshell.build(self.dic[self.file_active_now])))
+        self.menu_tools.add_command(label='build and Save',
+                command=lambda:(
+                    self.pythonshell.build(self.dic[self.file_active_now])
+                    ))
 
         # preference
-        self.menu_theme = Menu(self.menu_preference, tearoff=0)
+        self.menu_theme = Menu(self.menu_preference, bg='#1E201C', fg='white', tearoff=0)
         self.menu_preference.add_cascade(label='theme', menu=self.menu_theme)
         # font_tuple = font.families()
         font_tuple = ("Comic Sans MS","Courier New")
         for font_family in font_tuple:
             self.menu_theme.add_command(label=font_family,
-                    command=lambda:(self.text.configure(font=(font_family, 14))))
+                    command=lambda:(self.text.configure(font=(font_family, 11))))
         
         self.config(menu=self.menu, bg='#1E201C')
+    
+    def activeFile(self, directory):
+        self.text.delete(1.0, END)
+        with open(directory, 'r') as file_text:
+            self.text.insert(END, file_text.read())
+        self.title(f'{directory} - magic-text')
         
     def insertion(self):
         name, content , directory = openFileOrFolder('file')
+        self.file_active_now = name
+        self.dic[name] = directory
         self.title(f'{directory} - magic-text')
-        self.file_list.insert(END, name)       
+        self.file_list.insert(END, name)
+        self.text.delete(1.0, END)
         self.text.insert(END, content)
-        self.file_name.set(name)
+        Button(self.frame_top_right, text=name,
+                command=lambda:(self.activeFile(self.dic[name])),
+                bg='#262626', fg='#5A5C58' 
+                ).pack(side='left')
+
+    
+    def hideAndShowTerminal(self, mode):
+        try:
+            if mode == "show":
+                self.terminal.pack(side='bottom', fill='x', ipady=35)
+            elif mode == "hide":
+                self.terminal.destroy()
+                self.terminal = Entry(self.right, bg='#1E201C', fg='#FFFFFF', font=('Courier New', 14),textvariable=self.text_in_terminal)
+        except:
+            pass
     
     
 if __name__ == "__main__":
