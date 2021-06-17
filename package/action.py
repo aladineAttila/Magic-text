@@ -64,4 +64,5 @@ def openFileOrFolder(thing):
 
 if __name__ == "__main__":
     #openFileOrFolder('file')
-    popup('test')
+    #popup('test')
+    pass

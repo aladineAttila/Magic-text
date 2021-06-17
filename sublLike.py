@@ -4,7 +4,6 @@ from tkinter import (Frame, Text, Listbox,
         Entry, Button, StringVar, END,
         Menu, Label, font
         )
-# import action button
 from package.action import saveFile, openFileOrFolder, PythonShell
 
 
@@ -29,9 +28,6 @@ class App(Tk):
         self.right = Frame(self.frame, bg='#1E201C')
         self.frame_top_right = Frame(self.right, bg='#1E201C')
         self.file_name = StringVar()
-        #self.label = Button(self.frame_top_right, bg='#262626', fg='#5A5C58', textvariable=self.file_name)
-        #self.file_name.set('nothing')
-        #self.label.pack(side='left')
         
         self.frame_top_right.pack(fill="x")
         self.text = Text(self.right, bg='#2C2E28', fg='#FFFFFF', width=800, height=31)
@@ -107,7 +103,6 @@ class App(Tk):
                 command=lambda:(self.activeFile(self.dic[name])),
                 bg='#262626', fg='#5A5C58' 
                 ).pack(side='left')
-
     
     def hideAndShowTerminal(self, mode):
         try:
