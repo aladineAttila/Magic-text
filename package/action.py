@@ -10,44 +10,40 @@ class PythonShell:
         self.body = body
         self.entry_content = entry_content
     
-    def build(self, file_path, mode=None):
+    def build(self, file_path, mode=None, fonction_=None):
         code = self.body.get(1.0, END)
-        if mode == "buildAndWrite":
-            with open(file_path, 'w') as code_file:
-                code_file.write(code)
+        if file_path:
+            if mode == "buildAndWrite":
+                with open(file_path, 'w') as code_file:
+                    code_file.write(code)
+        else:
+            file_path = saveFile(content=self.body.get(1.0, END), fonction=fonction_)
         output = os.popen(f'python3 {file_path}').read()
         self.entry_content.set(output)
 
 
-def popup(content):
-    app = Toplevel()
-    app.geometry("250x100")
-    file_name = StringVar()
-    Label(app, text='Enter the name of file').pack()
-    frame = Frame(app)
-    Entry(frame, textvariable=file_name).pack(side='left')
-    def entre(file_name):
-        with open(f"{file_name}", 'w') as text:
-            if file_name != 'nothing' or file_name != "" or file_name != " ":
-                text.write(content)
-                app.destroy()
-    Button(frame, text='entre', command=lambda:(entre(file_name.get()))).pack(side='right')
-    frame.pack()
-    
+def saveFile(content ,file_name=None, fonction=None):
+    '''
+    args = content, file_name, fonction None by default
 
-def saveFile(content ,file_name, extension=None):
-    if file_name == 'nothing':
-        popup(content)
+    1- if file_name is None asksaveasfile and write content inside
+    2- call fonction insertion with fonction()
+    3- else save file with content
 
-    if extension is None:
-        with open(f"{file_name}", 'w') as text:
-            text.write(content)
-            return 1
+    :return: None
+    '''
+    if file_name == None:
+        files = filedialog.asksaveasfile(title='entre le nom de votre fichier', mode='w')
+        print(files)
+        with open(files.name, 'w') as file_text:
+            file_text.write(content)
+            file_name = files.name.split('/')[-1]
+            fonction('',file_name, content, files.name)
+            return files.name
+        
     else:
-        with open(f"{file_name}.{extension}", w) as text:
+        with open(f"{file_name}", 'w') as text:
             text.write(content)
-            return 1
-    return 0
 
     
 def openFileOrFolder(thing):
