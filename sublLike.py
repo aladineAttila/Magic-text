@@ -149,7 +149,6 @@ class App(Tk):
                 self.text.insert(END, file_text.read())
             self.title(f'{directory} - magic-text')
         
-<<<<<<< HEAD
     def insertion(self):
         """
         1 - open file broweser
@@ -159,7 +158,6 @@ class App(Tk):
         return None
         """
         name, content , directory = openFileOrFolder('file')
-=======
     def insertion(self, mode=None, name=None, content=None, directory=None):
         '''
         1- get name, contenu, directory
@@ -177,7 +175,6 @@ class App(Tk):
             name, content , directory = openFileOrFolder('file')
         self.file_active_now = name
         self.dic[name] = directory
->>>>>>> dev
         self.title(f'{directory} - magic-text')
         self.file_list.insert(END, name)
         self.text.delete(1.0, END)
