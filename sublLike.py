@@ -2,9 +2,29 @@
 from tkinter import Tk
 from tkinter import (Frame, Text, Listbox, 
         Entry, Button, StringVar, END,
-        Menu, Label, font
+        Menu, Label, font, Variable
         )
 from package.action import saveFile, openFileOrFolder, PythonShell
+
+
+class TextWithColorisation(Text):
+    def __init__(self, master=None, cnf={}, **kw):
+        super().__init__(master, cnf, **kw)
+        self._variable = Variable()
+ 
+    def findall(self, pattern, start='1.0', end='end'):
+ 
+        v = self._variable
+        s = self.tk.call(self, 'search', '-all',
+                  '-count', v,
+                  '-regexp', pattern,
+                  start, end)
+         
+        indices = []
+        for a, b in zip(s, v.get()):
+            indices += [ '%s' % a, '%s+%dc' % (a, b) ]
+            
+        return indices
 
 
 class App(Tk):
@@ -30,9 +50,12 @@ class App(Tk):
         self.file_name = StringVar()
         
         self.frame_top_right.pack(fill="x")
-        self.text = Text(self.right, bg='#2C2E28', fg='#FFFFFF', width=800, height=31)
+        self.text = TextWithColorisation(self.right, bg='#2C2E28', fg='#FFFFFF', width=800, height=31)
         self.text.pack(side='top', fill='y', expand=1)
         self.text.configure(font=('Courier New', 11))
+        
+        
+        
         self.text_in_terminal = StringVar()
         self.terminal = Entry(self.right, bg='#1E201C', fg='#FFFFFF', font=('Courier New', 14),textvariable=self.text_in_terminal)
         
@@ -71,7 +94,7 @@ class App(Tk):
                     self.pythonshell.build(self.dic[self.file_active_now])))
         self.menu_tools.add_command(label='build and Save',
                 command=lambda:(
-                    self.pythonshell.build(self.dic[self.file_active_now])
+                    self.pythonshell.build(self.dic[self.file_active_now], 'buildAndWrite')
                     ))
 
         # preference
@@ -84,12 +107,17 @@ class App(Tk):
                     command=lambda:(self.text.configure(font=(font_family, 11))))
         
         self.config(menu=self.menu, bg='#1E201C')
+
+        # key binding
+        self.text.bind('<KeyRelease>', self.groupAllFoctionColor)
     
     def activeFile(self, directory):
-        self.text.delete(1.0, END)
-        with open(directory, 'r') as file_text:
-            self.text.insert(END, file_text.read())
-        self.title(f'{directory} - magic-text')
+        self.groupAllFoctionColor('')
+        if self.file_active_now != directory.split('/')[-1]:
+            self.text.delete(1.0, END)
+            with open(directory, 'r') as file_text:
+                self.text.insert(END, file_text.read())
+            self.title(f'{directory} - magic-text')
         
     def insertion(self):
         name, content , directory = openFileOrFolder('file')
@@ -99,6 +127,7 @@ class App(Tk):
         self.file_list.insert(END, name)
         self.text.delete(1.0, END)
         self.text.insert(END, content)
+        self.groupAllFoctionColor('')
         Button(self.frame_top_right, text=name,
                 command=lambda:(self.activeFile(self.dic[name])),
                 bg='#262626', fg='#5A5C58' 
@@ -110,10 +139,28 @@ class App(Tk):
                 self.terminal.pack(side='bottom', fill='x', ipady=35)
             elif mode == "hide":
                 self.terminal.destroy()
-                self.terminal = Entry(self.right, bg='#1E201C', fg='#FFFFFF', font=('Courier New', 14),textvariable=self.text_in_terminal)
+                self.terminal = Entry(self.right, bg='#1E201C', fg='#FFFFFF', font=('Courier New', 14), textvariable=self.text_in_terminal)
         except:
             pass
+
+    def groupAllFoctionColor(self, e):
+        fonction = r'(if |elif |else:|def |for |while |try:|except|class )'
+        entre_g = r'"\w+"|\'\w+\''
+        autre = r'(print|set|get)'
+        object_ = r'(class|\w+\.)'
+        self.color('fonction', fonction, '#D25D5B')
+        self.color('autre', autre, '#CA7A02')
+        self.color('class', object_,'#3F82AC')
+        self.color('entre_g', entre_g,'#DFDC11')
     
+    def color(self, type_, keyword, hercolor):
+        try:
+            self.text.tag_configure(type_, foreground=hercolor, background='#2C2E28')
+            indices = self.text.findall(keyword)
+            self.text.tag_add(type_, *indices) 
+            
+        except:
+            pass
     
 if __name__ == "__main__":
     app = App()
