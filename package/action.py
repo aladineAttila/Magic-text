@@ -49,7 +49,7 @@ def saveFile(content ,file_name=None, fonction=None):
 def openFileOrFolder(thing):
     if thing == 'file':
         files =  filedialog.askopenfiles(title='select file to open on magic-text', mode='rb')
-        #os.chdir('/'.join(files[0].name.split('/')[:-1]))
+        os.chdir('/'.join(files[0].name.split('/')[:-1]))
         for file_ in files:
             with open(file_.name, 'r') as file_text:
                 return file_.name.split('/')[-1],file_text.read(), file_.name
