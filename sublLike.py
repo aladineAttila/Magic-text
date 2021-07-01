@@ -57,24 +57,25 @@ class App(Tk):
         # right frame contient text editor and label button
         # et le scrollbar et la linenumber
         self.right = Frame(self.frame, bg=app_background)
-        # bar de status
+        
+        # top barre
         self.frame_top_right = Frame(self.right, bg=app_background)
         self.file_name = StringVar()
         self.frame_top_right.pack(fill="x")
+        
         # text editor
         self.text_container = Frame(self.right)
         self.rigth_scrolbar = Scrollbar(self.text_container)
         self.rigth_scrolbar.pack(side="right", fill='y')
-        self.line_number = Listbox(self.text_container, width=1, height=31, font=(None,11),bg=text_widget_background, fg='#5A5C58', 
-                yscrollcommand=self.rigth_scrolbar.set)
+        self.line_number = Listbox(self.text_container, width=1, height=31, font=(None,11),bg=text_widget_background, fg='#5A5C58', yscrollcommand=self.rigth_scrolbar.set)
         self.line_number.pack(side='left', fill='y')
-        self.text = TextWithColorisation(self.text_container, undo=True, autoseparators=True, maxundo=-1,bg=text_widget_background, fg='#FFFFFF', width=800, height=31,
-                yscrollcommand=self.rigth_scrolbar.set)
+        self.text = TextWithColorisation(self.text_container, undo=True, autoseparators=True, maxundo=-1, bg=text_widget_background, fg='#FFFFFF', width=800, height=31, yscrollcommand=self.rigth_scrolbar.set)
         self.text.pack(side='left', fill='y')
-        self.rigth_scrolbar.config(command=self.scroll_yview)
+        self.rigth_scrolbar.config(command=self.scrollYview)
         self.font_active_now = 'Courier New'
         self.text.configure(insertbackground='white', font=('Courier New', 11))
         self.text_container.pack(side='top', fill='y', expand=1)
+        
         # terminal
         self.text_in_terminal = StringVar()
         self.terminal = Entry(self.right, bg=app_background, fg=app_foreground, font=('Courier New', 14),textvariable=self.text_in_terminal)
@@ -96,9 +97,8 @@ class App(Tk):
         self.menu.add_cascade(label='preference', menu=self.menu_preference)
 
         # menu file
-        self.menu_file.add_command(label='save Ctrl+S', 
-                command=lambda:self.ctrl_S('<Control+s>'))
-        self.menu_file.add_command(label='open file Ctrl+O',command=self.insertion)
+        self.menu_file.add_command(label='save Ctrl+S', command=lambda:self.ctrl_S('<Control+s>'))
+        self.menu_file.add_command(label='open file Ctrl+O', command=self.insertion)
         self.menu_file.add_command(label='quit Ctrl+Q', command=self.quit)
         
         # menu view
@@ -115,8 +115,7 @@ class App(Tk):
         font_tuple = ("Comic Sans MS","Courier New", "Helvetica", "Times New Roman")
         
         for font_family in font_tuple:
-            self.menu_theme.add_command(label=font_family,
-                    command=lambda:(self.changeFont(font_family)))
+            self.menu_theme.add_command(label=font_family, command=lambda:(self.changeFont(font_family)))
         
         self.config(menu=self.menu, bg=menu_background)
 
@@ -131,7 +130,7 @@ class App(Tk):
         self.term_mod = 'show'
         self.bind('<Control-t>', (lambda e:self.hideAndShowTerminal(self.term_mod)))
 
-    def scroll_yview(self, *args):
+    def scrollYview(self, *args):
         self.line_number.yview(*args)
         self.text.yview(*args)
     
@@ -143,7 +142,7 @@ class App(Tk):
         
     def ctrl_S(self, e):
         self.saveFile(self.text.get(1.0,END),self.file_active_now)
-    
+
     def ctrl_B(self, e):
         self.hideAndShowTerminal('show')
         try:
@@ -173,8 +172,9 @@ class App(Tk):
         :return: None
         '''
         os.chdir('/'.join(directory.split('/')[:-1])) # change the current directory
-        if self.file_active_now != directory.split('/')[-1]:
-            self.file_active_now = directory.split('/')[-1]
+        file_name = directory.split('/')[-1]
+        if self.file_active_now != file_name:
+            self.file_active_now = file_name
             self.text.delete(1.0, END)
             with open(directory, 'r') as file_text:
                 self.text.insert(END, file_text.read())
@@ -203,18 +203,14 @@ class App(Tk):
         self.text.delete(1.0, END)
         self.text.insert(END, content)
         self.groupFonction('<KeyRelease>')
-        Button(self.frame_top_right, text=name,
-                command=lambda:(self.activeFile(self.dic[name])),
-                bg='#262626', fg='#5A5C58', width=15, 
-                ).pack(side='left')
+        Button(self.frame_top_right, text=name, command=lambda:(self.activeFile(self.dic[name])), bg='#262626', fg='#5A5C58', width=15).pack(side='left')
     
     def saveFile(self, content ,file_name=None):
         '''
-        args = content, file_name, fonction None by default
+        args = content, file_name
 
         1- if file_name is None asksaveasfile and write content inside
-        2- call fonction insertion with fonction()
-        3- else save file with content
+        2- else save file with content
 
         :return: None
         '''
@@ -227,10 +223,23 @@ class App(Tk):
                 return files.name
             
         else:
-            with open(f"{file_name}", 'w') as text:
-                text.write(content)
+            with open(f"{file_name}", 'w') as file_text:
+                file_text.write(content)
 
     def build(self, file_path, mode=None):
+        '''
+        args = file_path, mode None by default
+
+        1- get text content
+        2- verify is file_path exist
+            write content in code_file
+            or 
+            call fonction saveFile
+        3- exectute code_file in file_path
+        4- print her output
+
+        :retrun: None
+        '''
         code = self.text.get(1.0, END)
         if file_path:
             if mode == "buildAndWrite":
@@ -243,17 +252,22 @@ class App(Tk):
 
     def openFile(self):
         '''
+        args = None
+
         1- openfiles dialog
         2- change the current directory
         3- open file
         
         :return: name, content, directory
         '''
-        files =  filedialog.askopenfiles(title='select file to open on magic-text', mode='rb')
-        os.chdir('/'.join(files[0].name.split('/')[:-1]))
-        for file_ in files:
-            with open(file_.name, 'r') as file_text:
-                return file_.name.split('/')[-1],file_text.read(), file_.name
+        try:            
+            files =  filedialog.askopenfiles(title='select file to open on magic-text', mode='rb')
+            os.chdir('/'.join(files[0].name.split('/')[:-1]))
+            for file_ in files:
+                with open(file_.name, 'r') as file_text:
+                    return file_.name.split('/')[-1],file_text.read(), file_.name
+        except:
+            pass
 
     def hideAndShowTerminal(self, mode):
         try:
@@ -268,10 +282,16 @@ class App(Tk):
             pass
 
     def updateLineNumber(self):
-        # 1- effacer la line_number
-        # 2- recupere le nombre de ligne
-        # 3- insert le nombre de ligne
-        # configure la taille width line_number en fonction de la taille des chiffre
+        '''
+        args = None
+
+        1- effacer la line_number
+        2- recupere le nombre de ligne
+        3- insert le nombre de ligne
+        configure la taille width line_number en fonction de la taille des chiffre
+
+        :return: None
+        '''
         self.line_number.delete(0, END)
         line = len(self.text.get(1.0, END).split('\n'))
         list = []
