@@ -2,9 +2,9 @@
 from tkinter import Tk
 from tkinter import (Frame, Text, Listbox, 
         Entry, Button, StringVar, END,
-        Menu, Label, font, Variable, ACTIVE, Scrollbar 
+        Menu, Label, font, Variable, ACTIVE, Scrollbar,
+        filedialog
         )
-from package.action import saveFile, openFile, PythonShell
 import os
 
 class TextWithColorisation(Text):
@@ -106,7 +106,6 @@ class App(Tk):
         self.menu_view.add_command(label='hide terminal Ctrl+T', command=lambda:self.hideAndShowTerminal('hide'))
                 
         # menu tools
-        self.pythonshell = PythonShell(self.text, self.text_in_terminal)
         self.menu_tools.add_command(label='Build Ctrl+B', command=lambda:self.ctrl_B('<Control-b>'))
 
         # preference
@@ -143,14 +142,14 @@ class App(Tk):
             pass
         
     def ctrl_S(self, e):
-        saveFile(self.text.get(1.0,END),self.file_active_now, self.insertion)
+        self.saveFile(self.text.get(1.0,END),self.file_active_now)
     
     def ctrl_B(self, e):
         self.hideAndShowTerminal('show')
         try:
-            self.pythonshell.build(self.dic[self.file_active_now], 'buildAndWrite', self.insertion)
+            self.build(self.dic[self.file_active_now], 'buildAndWrite')
         except:
-            self.pythonshell.build(None, 'buildAndWrite', self.insertion)
+            self.build(None, 'buildAndWrite')
     
     def fillOut(self,e):
         try:
@@ -196,7 +195,7 @@ class App(Tk):
         :return: None
         '''
         if mode == None:
-            name, content , directory = openFile()
+            name, content , directory = self.openFile()
         self.file_active_now = name
         self.dic[name] = directory
         self.title(f'{directory} - magic-text')
@@ -209,6 +208,53 @@ class App(Tk):
                 bg='#262626', fg='#5A5C58', width=15, 
                 ).pack(side='left')
     
+    def saveFile(self, content ,file_name=None):
+        '''
+        args = content, file_name, fonction None by default
+
+        1- if file_name is None asksaveasfile and write content inside
+        2- call fonction insertion with fonction()
+        3- else save file with content
+
+        :return: None
+        '''
+        if file_name == None:
+            files = filedialog.asksaveasfile(title='entre le nom de votre fichier', mode='w')
+            with open(files.name, 'w') as file_text:
+                file_text.write(content)
+                file_name = files.name.split('/')[-1]
+                self.insertion('',file_name, content, files.name)
+                return files.name
+            
+        else:
+            with open(f"{file_name}", 'w') as text:
+                text.write(content)
+
+    def build(self, file_path, mode=None):
+        code = self.text.get(1.0, END)
+        if file_path:
+            if mode == "buildAndWrite":
+                with open(file_path, 'w') as code_file:
+                    code_file.write(code)
+        else:
+            file_path = self.saveFile(content=self.text.get(1.0, END))
+        output = os.popen(f'python3 {file_path}').read()
+        self.text_in_terminal.set(output)
+
+    def openFile(self):
+        '''
+        1- openfiles dialog
+        2- change the current directory
+        3- open file
+        
+        :return: name, content, directory
+        '''
+        files =  filedialog.askopenfiles(title='select file to open on magic-text', mode='rb')
+        os.chdir('/'.join(files[0].name.split('/')[:-1]))
+        for file_ in files:
+            with open(file_.name, 'r') as file_text:
+                return file_.name.split('/')[-1],file_text.read(), file_.name
+
     def hideAndShowTerminal(self, mode):
         try:
             if mode == "show":
@@ -258,6 +304,8 @@ class App(Tk):
             
         except:
             pass
+
+
     
 if __name__ == "__main__":
     app = App()
