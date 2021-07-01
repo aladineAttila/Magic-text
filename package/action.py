@@ -46,19 +46,22 @@ def saveFile(content ,file_name=None, fonction=None):
             text.write(content)
 
     
-def openFileOrFolder(thing):
-    if thing == 'file':
-        files =  filedialog.askopenfiles(title='select file to open on magic-text', mode='rb')
-        os.chdir('/'.join(files[0].name.split('/')[:-1]))
-        for file_ in files:
-            with open(file_.name, 'r') as file_text:
-                return file_.name.split('/')[-1],file_text.read(), file_.name
-    elif thing == "folder":
-        folders = filedialog.askdirectory(initialdir='/', title='Select folder to open on magic-text')
-        return folders
-
+def openFile():
+    '''
+    1- openfiles dialog
+    2- change the current directory
+    3- open file
+    
+    :return: name, content, directory
+    '''
+    files =  filedialog.askopenfiles(title='select file to open on magic-text', mode='rb')
+    os.chdir('/'.join(files[0].name.split('/')[:-1]))
+    for file_ in files:
+        with open(file_.name, 'r') as file_text:
+            return file_.name.split('/')[-1],file_text.read(), file_.name
+    
 
 if __name__ == "__main__":
-    #openFileOrFolder('file')
+    #openFile('file')
     #popup('test')
     pass
