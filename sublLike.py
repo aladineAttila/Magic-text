@@ -27,7 +27,7 @@ class TextWithColorisation(Text):
         return indices
 
 
-app_background = "#1E201C"
+app_background = "#181915"
 app_foreground = "white"
 text_widget_background = "#2C2E28"
 text_widget_foreground = "white"
@@ -49,7 +49,7 @@ class App(Tk):
         
         # left frame contient file_list
         self.left = Frame(self.frame, bg=app_background)
-        self.enthete = Label(self.left, bg=app_background, fg='#5A5C58', text='file').pack(ipady=5)
+        self.enthete = Label(self.left, bg=app_background, fg='#9E9F9B', text='FILES', font=(None, 12, 'bold')).pack()
         self.file_list = Listbox(self.left, bg=app_background, fg='white', width=20, height=48)
         self.file_list.pack()
         self.left.pack(side='left', fill='y')
@@ -91,19 +91,19 @@ class App(Tk):
         self.menu_tools = Menu(self.menu, bg=menu_background, fg=menu_foreground, tearoff=0)
         
         # add menu file into menu
-        self.menu.add_cascade(label='file', menu=self.menu_file)
-        self.menu.add_cascade(label='view', menu=self.menu_view)
-        self.menu.add_cascade(label='tools', menu=self.menu_tools)
-        self.menu.add_cascade(label='preference', menu=self.menu_preference)
+        self.menu.add_cascade(label='File', menu=self.menu_file)
+        self.menu.add_cascade(label='View', menu=self.menu_view)
+        self.menu.add_cascade(label='Tools', menu=self.menu_tools)
+        self.menu.add_cascade(label='Preference', menu=self.menu_preference)
 
         # menu file
-        self.menu_file.add_command(label='save Ctrl+S', command=lambda:self.ctrl_S('<Control+s>'))
-        self.menu_file.add_command(label='open file Ctrl+O', command=self.insertion)
-        self.menu_file.add_command(label='quit Ctrl+Q', command=self.quit)
+        self.menu_file.add_command(label='Save Ctrl+S', command=lambda:self.ctrl_S('<Control+s>'))
+        self.menu_file.add_command(label='Open file Ctrl+O', command=self.insertion)
+        self.menu_file.add_command(label='Quit Ctrl+Q', command=self.quit)
         
         # menu view
-        self.menu_view.add_command(label="show terminal Ctrl+T", command=lambda:self.hideAndShowTerminal('show'))
-        self.menu_view.add_command(label='hide terminal Ctrl+T', command=lambda:self.hideAndShowTerminal('hide'))
+        self.menu_view.add_command(label="Show terminal Ctrl+T", command=lambda:self.hideAndShowTerminal('show'))
+        self.menu_view.add_command(label='Hide terminal Ctrl+T', command=lambda:self.hideAndShowTerminal('hide'))
                 
         # menu tools
         self.menu_tools.add_command(label='Build Ctrl+B', command=lambda:self.ctrl_B('<Control-b>'))
@@ -181,15 +181,6 @@ class App(Tk):
             self.title(f'{directory} - magic-text')
         self.groupFonction('<KeyRelease>')
         
-    def insertion(self):
-        """
-        1 - open file broweser
-        2 - insert file name in file_list
-        3 - set text in label
-        
-        return None
-        """
-        name, content , directory = openFileOrFolder('file')
     def insertion(self, mode=None, name=None, content=None, directory=None):
         '''
         1- get name, contenu, directory
@@ -205,14 +196,18 @@ class App(Tk):
         '''
         if mode == None:
             name, content , directory = self.openFile()
-        self.file_active_now = name
-        self.dic[name] = directory
-        self.title(f'{directory} - magic-text')
-        self.file_list.insert(END, name)
-        self.text.delete(1.0, END)
-        self.text.insert(END, content)
-        self.groupFonction('<KeyRelease>')
-        Button(self.frame_top_right, text=name, command=lambda:(self.activeFile(self.dic[name])), bg='#262626', fg='#5A5C58', width=15).pack(side='left')
+        
+        if name and content and directory:
+            self.file_active_now = name
+            # si la cle existe deja dans le dictionnaire
+            if name not in self.dic:
+                self.dic[name] = directory
+                self.title(f'{directory} - magic-text')
+                self.file_list.insert(END, name)
+                self.text.delete(1.0, END)
+                self.text.insert(END, content)
+                self.groupFonction('<KeyRelease>')
+                Button(self.frame_top_right, text=name, command=lambda:(self.activeFile(self.dic[name])), bg=text_widget_background, fg='white', width=15).pack(side='left')
     
     def saveFile(self, content ,file_name=None):
         '''
@@ -221,7 +216,7 @@ class App(Tk):
         1- if file_name is None asksaveasfile and write content inside
         2- else save file with content
 
-        :return: None
+        :return: file_path
         '''
         if file_name == None:
             files = filedialog.asksaveasfile(title='entre le nom de votre fichier', mode='w')
@@ -276,7 +271,7 @@ class App(Tk):
                 with open(file_.name, 'r') as file_text:
                     return file_.name.split('/')[-1],file_text.read(), file_.name
         except:
-            pass
+            return None, None, None
 
     def hideAndShowTerminal(self, mode):
         try:
@@ -333,7 +328,6 @@ class App(Tk):
             
         except:
             pass
-
 
     
 if __name__ == "__main__":
