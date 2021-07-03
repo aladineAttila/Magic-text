@@ -3,7 +3,7 @@ from tkinter import Tk
 from tkinter import (Frame, Text, Listbox, 
         Entry, Button, StringVar, END,
         Menu, Label, font, Variable, ACTIVE, Scrollbar,
-        filedialog
+        filedialog, re
         )
 import os
 
@@ -45,18 +45,18 @@ class App(Tk):
         self.file_active_now = None
         
         # Frame principal
-        self.frame = Frame(self, bg=app_background)
+        self.main_frame = Frame(self, bg=app_background)
         
         # left frame contient file_list
-        self.left = Frame(self.frame, bg=app_background)
-        self.enthete = Label(self.left, bg=app_background, fg='#9E9F9B', text='FILES', font=(None, 12, 'bold')).pack()
-        self.file_list = Listbox(self.left, bg=app_background, fg='white', width=20, height=48)
+        self.left_frame = Frame(self.main_frame, bg=app_background)
+        self.enthete = Label(self.left_frame, bg=app_background, fg='#9E9F9B', text='FILES', font=(None, 12, 'bold')).pack()
+        self.file_list = Listbox(self.left_frame, bg=app_background, fg='white', width=20, height=48)
         self.file_list.pack()
-        self.left.pack(side='left', fill='y')
+        self.left_frame.pack(side='left', fill='y')
         
         # right frame contient text editor and label button
         # et le scrollbar et la linenumber
-        self.right = Frame(self.frame, bg=app_background)
+        self.right = Frame(self.main_frame, bg=app_background)
         
         # top barre
         self.frame_top_right = Frame(self.right, bg=app_background)
@@ -64,24 +64,24 @@ class App(Tk):
         self.frame_top_right.pack(fill="x")
         
         # text editor
-        self.text_container = Frame(self.right)
-        self.rigth_scrolbar = Scrollbar(self.text_container)
+        self.frame_bottom_right = Frame(self.right)
+        self.rigth_scrolbar = Scrollbar(self.frame_bottom_right)
         self.rigth_scrolbar.pack(side="right", fill='y')
-        self.line_number = Listbox(self.text_container, width=1, height=31, font=(None,11),bg=text_widget_background, fg='#5A5C58', yscrollcommand=self.rigth_scrolbar.set)
+        self.line_number = Listbox(self.frame_bottom_right, width=1, height=31, font=(None,11),bg=text_widget_background, fg='#5A5C58', yscrollcommand=self.rigth_scrolbar.set)
         self.line_number.pack(side='left', fill='y')
-        self.text = TextWithColorisation(self.text_container, undo=True, autoseparators=True, maxundo=-1, bg=text_widget_background, fg='#FFFFFF', width=800, height=31, yscrollcommand=self.rigth_scrolbar.set)
-        self.text.pack(side='left', fill='y')
+        self.text_area = TextWithColorisation(self.frame_bottom_right, undo=True, autoseparators=True, maxundo=-1, bg=text_widget_background, fg='#FFFFFF', width=800, height=31, yscrollcommand=self.rigth_scrolbar.set)
+        self.text_area.pack(side='left', fill='y')
         self.rigth_scrolbar.config(command=self.scrollYview)
         self.font_active_now = 'Courier New'
-        self.text.configure(insertbackground='white', font=('Courier New', 11))
-        self.text_container.pack(side='top', fill='y', expand=1)
+        self.text_area.configure(insertbackground='white', font=('Courier New', 11))
+        self.frame_bottom_right.pack(side='top', fill='y', expand=1)
         
         # terminal
         self.text_in_terminal = StringVar()
         self.terminal = Entry(self.right, bg=app_background, fg=app_foreground, font=('Courier New', 14),textvariable=self.text_in_terminal)
         self.right.pack(side='right', fill='y')
         
-        self.frame.pack(fill='x')
+        self.main_frame.pack(fill='x')
         
         # Barre de menu
         self.menu = Menu(self, bg=menu_background, fg=menu_foreground) 
@@ -120,7 +120,7 @@ class App(Tk):
         self.config(menu=self.menu, bg=menu_background)
 
         # key binding
-        self.text.bind('<KeyRelease>', self.groupFonction)
+        self.text_area.bind('<KeyRelease>', self.groupFonction)
         self.file_list.bind('<<ListboxSelect>>', self.fillOut)
         self.bind('<Control-s>', self.ctrl_S)
         self.bind('<Control-b>', self.ctrl_B)
@@ -129,19 +129,20 @@ class App(Tk):
         self.bind('<Control-y>', self.ctrl_Y)
         self.term_mod = 'show'
         self.bind('<Control-t>', (lambda e:self.hideAndShowTerminal(self.term_mod)))
+        self.text_area.bind('<Return>', self.autoIndent)
 
     def scrollYview(self, *args):
         self.line_number.yview(*args)
-        self.text.yview(*args)
+        self.text_area.yview(*args)
     
     def ctrl_Y(self, e):
         try:
-            self.text.edit_redo()
+            self.text_area.edit_redo()
         except:
             pass
         
     def ctrl_S(self, e):
-        self.saveFile(self.text.get(1.0,END),self.file_active_now)
+        self.saveFile(self.text_area.get(1.0,END),self.file_active_now)
 
     def ctrl_B(self, e):
         self.hideAndShowTerminal('show')
@@ -158,7 +159,7 @@ class App(Tk):
     
     def changeFont(self, font_family):
             self.font_active_now = font_family
-            self.text.configure(font=(font_family, 11))
+            self.text_area.configure(font=(font_family, 11))
     
     def activeFile(self, directory):
         '''
@@ -175,9 +176,9 @@ class App(Tk):
         file_name = directory.split('/')[-1]
         if self.file_active_now != file_name:
             self.file_active_now = file_name
-            self.text.delete(1.0, END)
+            self.text_area.delete(1.0, END)
             with open(directory, 'r') as file_text:
-                self.text.insert(END, file_text.read())
+                self.text_area.insert(END, file_text.read())
             self.title(f'{directory} - magic-text')
         self.groupFonction('<KeyRelease>')
         
@@ -204,8 +205,8 @@ class App(Tk):
                 self.dic[name] = directory
                 self.title(f'{directory} - magic-text')
                 self.file_list.insert(END, name)
-                self.text.delete(1.0, END)
-                self.text.insert(END, content)
+                self.text_area.delete(1.0, END)
+                self.text_area.insert(END, content)
                 self.groupFonction('<KeyRelease>')
                 Button(self.frame_top_right, text=name, command=lambda:(self.activeFile(self.dic[name])), bg=text_widget_background, fg='white', width=15).pack(side='left')
     
@@ -244,13 +245,13 @@ class App(Tk):
 
         :retrun: None
         '''
-        code = self.text.get(1.0, END)
+        code = self.text_area.get(1.0, END)
         if file_path:
             if mode == "buildAndWrite":
                 with open(file_path, 'w') as code_file:
                     code_file.write(code)
         else:
-            file_path = self.saveFile(content=self.text.get(1.0, END))
+            file_path = self.saveFile(content=self.text_area.get(1.0, END))
         output = os.popen(f'python3 {file_path}').read()
         self.text_in_terminal.set(output)
 
@@ -297,7 +298,7 @@ class App(Tk):
         :return: None
         '''
         self.line_number.delete(0, END)
-        line = len(self.text.get(1.0, END).split('\n'))
+        line = len(self.text_area.get(1.0, END).split('\n'))
         list = []
         for i in range(1, line):
             self.line_number.insert(END, str(i))
@@ -322,14 +323,32 @@ class App(Tk):
     
     def color(self, type_, keyword, hercolor):
         try:
-            self.text.tag_configure(type_, font=(self.font_active_now, 11, 'bold'), foreground=hercolor, background=text_widget_background)
-            indices = self.text.findall(keyword)
-            self.text.tag_add(type_, *indices) 
+            self.text_area.tag_configure(type_, font=(self.font_active_now, 11, 'bold'), foreground=hercolor, background=text_widget_background)
+            indices = self.text_area.findall(keyword)
+            self.text_area.tag_add(type_, *indices) 
             
         except:
             pass
 
-    
+    def autoIndent(self, e):
+        '''
+        args Event
+
+        1- get la dernier ligne
+        2- get nombre de tab
+        3- insert tab
+        
+        :return: break
+        '''
+        end_line = self.text_area.get('insert linestart', 'insert lineend')
+        tab = len([t for t in end_line.split('\t') if t == ''])
+        if end_line[-1] == ':':
+            self.text_area.insert('insert',"\n" + "\t"*(tab+1))
+        else:
+            self.text_area.insert('insert',"\n" + "\t"*tab)
+        return 'break'
+
+
 if __name__ == "__main__":
     app = App()
     app.mainloop()
