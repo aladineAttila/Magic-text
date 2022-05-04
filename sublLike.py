@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 import os
-from tkinter import Frame, Text, Listbox, Button, StringVar, END, Menu, Label, ACTIVE, Scrollbar, filedialog, PhotoImage
-from tkinter import Tk
+from tkinter import (
+        Tk, Frame, Text, Listbox, Button, StringVar, END, Menu, 
+        Label, ACTIVE, Scrollbar, filedialog, PhotoImage
+)
+# import customtkinter
 
 from mywidget.text import TextWithColorisation
 from plugin.colorshemes import Colorscheme
+
+# customtkinter.set_apperance_mode("System")
+# customtkinter.set_default_color_theme("blue")
 
 BACKGROUND = "#181915"
 FOREGROUND = "white"
@@ -321,20 +327,21 @@ class App(Tk):
 
     def groupFonction(self, e):
         self.color(*self.colorscheme.keyword)
-        self.color(*self.colorscheme.string)
         self.color(*self.colorscheme.function)
+        self.color(*self.colorscheme.char)
+        self.color(*self.colorscheme.string)
         self.color(*self.colorscheme.comment)
         self.updateLineNumber()
 
-    def change_colorsheme(self, *title_colorschemes):
-        self.colorscheme = Colorscheme(f'{CURRENT_DIRECTORY}/plugin/colorshemes', title_colorschemes[0])
+    def change_colorsheme(self, title_colorschemes):
+        self.colorscheme = Colorscheme(f'{CURRENT_DIRECTORY}/plugin/colorshemes', title_colorschemes)
         self.textarea.config(fg=self.colorscheme.color['normal-foreground'],
                              bg=self.colorscheme.color['normal-background'],
                              insertbackground=self.colorscheme.color['cursor-foreground'])
         self.line_number.config(fg=self.colorscheme.color['linenumber-foreground'],
                                 bg=self.colorscheme.color['linenumber-background'])
-        self.file_list.config(fg=self.colorscheme.color['linenumber-foreground'],
-                              bg=self.colorscheme.color['linenumber-background'])
+        self.file_list.config(fg=self.colorscheme.color['normal-foreground'],
+                              bg=self.colorscheme.color['normal-background'])
         self.groupFonction('')
 
     def color(self, type_, regex, foreground_, background_):
@@ -346,7 +353,6 @@ class App(Tk):
             self.textarea.tag_add(type_, *indices)
 
         except Exception as e:
-            print(e)
             pass
 
     def autoIndent(self, e):

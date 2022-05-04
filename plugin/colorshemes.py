@@ -19,13 +19,7 @@ def generate_dictionnairy(themes):
     return dictionnairy
 
 
-def loadRegex():
-    with open('all_fonction_python', 'r') as file_fonction:
-        r = "|".join(elt.strip("\n").lower() for elt in file_fonction.readlines())
-        return r
-
-
-def loading_colorscheme(path):
+def readColorscheme(path):
     with open(path, 'r') as colorschemes:
         themes = colorschemes.read()
         return generate_dictionnairy(themes)
@@ -33,7 +27,7 @@ def loading_colorscheme(path):
 
 class Colorscheme:
     def __init__(self, path, title_colorschemes):
-        self.colorschemes = loading_colorscheme(path)
+        self.colorschemes = readColorscheme(path)
         self.color = self.colorschemes[title_colorschemes]
 
         self.function = ('fonction',
@@ -55,11 +49,9 @@ class Colorscheme:
         self.keyword = ('keyword', r'(if |elif |else:|def |for |while |try:|except|class|from |import | as | in '
                                    r'|return )', self.color['keyword-foreground'], self.color['keyword-background'])
 
-        self.comment = ('comment', r'(#.+)', self.color['comment-foreground'], self.color['comment-background'])
+        self.comment = ('comment', r'(#.+|""".+""")', self.color['comment-foreground'], self.color['comment-background'])
 
-        self.string = ('string', r'(".+\"|\'.+\')', self.color['string-foreground'], self.color['string-background'])
+        self.char = ('char', r'(\'.+\')', self.color['string-foreground'], self.color['string-background'])
 
+        self.string = ('string', r'(".+")', self.color['string-foreground'], self.color['string-background'])
 
-if __name__ == "__main__":
-    # print([elt for elt in loading_colorscheme('colorshemes')])
-    print(loadRegex())
