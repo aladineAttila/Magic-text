@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-def generate_dictionnairy(themes):
+def generateDict(themes):
     themes = [elt.split('\n') for elt in themes.split("\n\n")]
     dictionnairy = {}
     title = ''
@@ -22,7 +22,7 @@ def generate_dictionnairy(themes):
 def readColorscheme(path):
     with open(path, 'r') as colorschemes:
         themes = colorschemes.read()
-        return generate_dictionnairy(themes)
+        return generateDict(themes)
 
 
 class Colorscheme:

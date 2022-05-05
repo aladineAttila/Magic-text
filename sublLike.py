@@ -92,7 +92,7 @@ class App(Tk):
         self.menu.add_cascade(label='Preference', menu=self.menu_preference)
 
         # menu file
-        self.menu_file.add_command(label='Save Ctrl+S', command=lambda: self.ctrl_S('<Control+s>'))
+        self.menu_file.add_command(label='Save Ctrl+S', command=lambda: self.ctrlS('<Control+s>'))
         self.menu_file.add_command(label='Open file Ctrl+O', command=self.insertion)
         self.menu_file.add_command(label='Quit Ctrl+Q', command=self.quit)
 
@@ -101,7 +101,7 @@ class App(Tk):
         self.menu_view.add_command(label='Hide terminal Ctrl+T', command=lambda: self.hideAndShowTerminal('hide'))
 
         # menu tools
-        self.menu_tools.add_command(label='Build Ctrl+B', command=lambda: self.ctrl_B('<Control-b>'))
+        self.menu_tools.add_command(label='Build Ctrl+B', command=lambda: self.ctrlB('<Control-b>'))
 
         # preference
         self.menu_font = Menu(self.menu_preference, bg=MENU_BACKGROUND, fg=MENU_FOREGROUND, tearoff=0)
@@ -135,11 +135,11 @@ class App(Tk):
         # key binding
         self.textarea.bind('<KeyRelease>', self.groupFonction)
         self.file_list.bind('<<ListboxSelect>>', self.fillOut)
-        self.bind('<Control-s>', self.ctrl_S)
-        self.bind('<Control-b>', self.ctrl_B)
+        self.bind('<Control-s>', self.ctrlS)
+        self.bind('<Control-b>', self.ctrlB)
         self.bind('<Control-o>', (lambda e: self.insertion()))
         self.bind('<Control-q>', (lambda e: self.quit()))
-        self.bind('<Control-y>', self.ctrl_Y)
+        self.bind('<Control-y>', self.ctrlY)
         self.term_mod = 'show'
         self.bind('<Control-t>', (lambda e: self.hideAndShowTerminal(self.term_mod)))
         self.textarea.bind('<Return>', self.autoIndent)
@@ -148,16 +148,16 @@ class App(Tk):
         self.line_number.yview(*args)
         self.textarea.yview(*args)
 
-    def ctrl_Y(self, e):
+    def ctrlY(self, e):
         try:
             self.textarea.edit_redo()
         except:
             pass
 
-    def ctrl_S(self, e):
+    def ctrlS(self, e):
         self.saveFile(self.textarea.get(1.0, END), self.file_active_now)
 
-    def ctrl_B(self, e):
+    def ctrlB(self, e):
         self.hideAndShowTerminal('show')
         try:
             self.build(self.dic[self.file_active_now], 'buildAndWrite')
