@@ -1,4 +1,4 @@
-# SUBLLIKE desktop application 
+# SUBLLIKE 
 
 ## Install
 
