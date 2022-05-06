@@ -14,7 +14,6 @@
 
 ### Image
 ![change colorscheme](image/change-colorscheme.png)
-![light mode](image/ligth-mode.png)
 ![monokai](image/monokai.png)
 
 
