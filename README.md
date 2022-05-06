@@ -13,5 +13,8 @@
 - build python code
 
 ### Image
-![screenshot](image/screen1.png)
+![change colorscheme](image/change-colorscheme.png)
+![light mode](image/ligth-mode.png)
+![monokai](image/monokai.png)
+
 
