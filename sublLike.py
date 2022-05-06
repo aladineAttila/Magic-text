@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 import os
 from tkinter import (
-        Tk, Frame, Text, Listbox, Button, StringVar, END, Menu, 
-        Label, ACTIVE, Scrollbar, filedialog, PhotoImage
+        Tk, Text, Listbox, Button, StringVar, END, Menu,
+        ACTIVE, Scrollbar, filedialog, PhotoImage
 )
-# import customtkinter
+import customtkinter
 
 from mywidget.text import TextWithColorisation
 from plugin.colorshemes import Colorscheme
 
-# customtkinter.set_apperance_mode("System")
-# customtkinter.set_default_color_theme("blue")
+customtkinter.set_appearance_mode("System")
+customtkinter.set_default_color_theme("blue")
 
 BACKGROUND = "#181915"
 FOREGROUND = "white"
@@ -22,9 +22,9 @@ MENU_FOREGROUND = "#1E201C"
 CURRENT_DIRECTORY = os.path.abspath('.')
 
 
-class App(Tk):
+class App(customtkinter.CTk):
     def __init__(self):
-        Tk.__init__(self)
+        super().__init__()
         self.title('magic-text')
         self.geometry("1000x800")
         self.dic = {}
@@ -32,13 +32,12 @@ class App(Tk):
         self.call('wm', 'iconphoto', self._w, PhotoImage(file='sublike.png'))
         self.colorscheme = Colorscheme(f'{CURRENT_DIRECTORY}/plugin/colorshemes', 'IDLE Classic')
 
-        # Frame principal
-        self.main_frame = Frame(self, bg=BACKGROUND)
+        # customtkinter.CTkFrame principal
+        self.main_frame = customtkinter.CTkFrame(self, bg=BACKGROUND)
 
         # left frame contient file_list
-        self.left_frame = Frame(self.main_frame, bg=BACKGROUND)
-        self.enthete = Label(self.left_frame, bg=BACKGROUND, fg='#9E9F9B', text='FILES',
-                             font=(None, 12, 'bold')).pack(ipady=4)
+        self.left_frame = customtkinter.CTkFrame(self.main_frame, bg=BACKGROUND)
+        self.enthete = customtkinter.CTkLabel(self.left_frame, bg=BACKGROUND, fg='#9E9F9B', text='FILES').pack(ipady=4)
         self.file_list = Listbox(self.left_frame, bg=self.colorscheme.color['normal-background'],
                                  fg=self.colorscheme.color['normal-foreground'], width=20, height=48)
         self.file_list.pack()
@@ -46,15 +45,15 @@ class App(Tk):
 
         # right frame contient text editor and label button
         # et le scrollbar et la linenumber
-        self.right = Frame(self.main_frame, bg=BACKGROUND)
+        self.right = customtkinter.CTkFrame(self.main_frame, bg=BACKGROUND)
 
         # top barre
-        self.frame_top_right = Frame(self.right, bg=BACKGROUND)
+        self.frame_top_right = customtkinter.CTkFrame(self.right, bg=BACKGROUND, height=0)
         self.file_name = StringVar()
         self.frame_top_right.pack(fill="x")
 
         # text editor
-        self.frame_bottom_right = Frame(self.right)
+        self.frame_bottom_right = customtkinter.CTkFrame(self.right)
         self.scrollbar = Scrollbar(self.frame_bottom_right)
         self.scrollbar.pack(side="right", fill='y')
         self.line_number = Listbox(self.frame_bottom_right, width=1, height=31, font=(None, 11),
@@ -148,33 +147,33 @@ class App(Tk):
         self.line_number.yview(*args)
         self.textarea.yview(*args)
 
-    def ctrlY(self, e):
+    def ctrlY(self, e: str) -> None:
         try:
             self.textarea.edit_redo()
         except:
             pass
 
-    def ctrlS(self, e):
+    def ctrlS(self, e: str) -> None:
         self.saveFile(self.textarea.get(1.0, END), self.file_active_now)
 
-    def ctrlB(self, e):
+    def ctrlB(self, e: str) -> None:
         self.hideAndShowTerminal('show')
         try:
             self.build(self.dic[self.file_active_now], 'buildAndWrite')
         except:
             self.build(None, 'buildAndWrite')
 
-    def fillOut(self, e):
+    def fillOut(self, e: str) -> None:
         try:
             self.activeFile(self.dic[self.file_list.get(ACTIVE)])
         except:
             pass
 
-    def changeFont(self, font_family):
+    def changeFont(self, font_family: str) -> None:
         self.font_active_now = font_family
         self.textarea.configure(font=(font_family, 11))
 
-    def activeFile(self, directory):
+    def activeFile(self, directory: str) -> None:
         """
         1- Change the current directory
         2- verify if self.acitve_now
@@ -194,7 +193,7 @@ class App(Tk):
             self.title(f'{directory} - magic-text')
         self.groupFonction('<KeyRelease>')
 
-    def insertion(self, mode=None, name=None, content=None, directory=None):
+    def insertion(self, mode: str=None, name: str=None, content: str=None, directory: str=None) -> None:
         """
         1- get name, contenu, directory
         2- set file_active_now to name
@@ -227,7 +226,7 @@ class App(Tk):
                        command=lambda: (self.activeFile(self.dic[name])), bg=TEXT_BACKGROUND, fg='white',
                        width=15).pack(side='left', ipady=4)
 
-    def saveFile(self, content, file_name=None):
+    def saveFile(self, content: str, file_name: str=None) -> str:
         """
         1- if file_name is None asksaveasfile and write content inside
         2- else save file with content
@@ -248,10 +247,11 @@ class App(Tk):
             else:
                 with open(f"{file_name}", 'w') as file_text:
                     file_text.write(content)
+                    return files.name
         except AttributeError:
             pass
 
-    def build(self, file_path, mode=None):
+    def build(self, file_path: str, mode: str=None) -> None:
         """
         1- get text content
         2- verify is file_path exist
@@ -276,7 +276,7 @@ class App(Tk):
         self.terminal.delete(1.0, END)
         self.terminal.insert(END, output)
 
-    def openFile(self):
+    def openFile(self) -> tuple:
         """
         args = None
 
@@ -291,7 +291,10 @@ class App(Tk):
             os.chdir('/'.join(files[0].name.split('/')[:-1]))
             for file_ in files:
                 with open(file_.name, 'r') as file_text:
-                    return file_.name.split('/')[-1], file_text.read(), file_.name
+                    name = file_.name.split("/")[-1]
+                    content = file_text.read()
+                    path = file_.name
+                    return name, content, path
         except:
             return None, None, None
 
