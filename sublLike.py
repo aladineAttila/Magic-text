@@ -309,6 +309,17 @@ class App(customtkinter.CTk):
         except:
             pass
 
+    def color(self, type_, regex, foreground_, background_):
+        try:
+            self.textarea.tag_configure(type_, font=(self.font_active_now, 11, 'bold'), foreground=foreground_,
+                                        background=background_)
+            indices = self.textarea.findall(regex)
+
+            self.textarea.tag_add(type_, *indices)
+
+        except Exception as e:
+            pass
+
     def updateLineNumber(self):
         """
         args = None
@@ -331,6 +342,7 @@ class App(customtkinter.CTk):
     def groupFonction(self, e):
         self.color(*self.colorscheme.keyword)
         self.color(*self.colorscheme.function)
+        self.color(*self.colorscheme.parenthese)
         self.color(*self.colorscheme.char)
         self.color(*self.colorscheme.string)
         self.color(*self.colorscheme.comment)
@@ -346,18 +358,7 @@ class App(customtkinter.CTk):
         self.file_list.config(fg=self.colorscheme.color['normal-foreground'],
                               bg=self.colorscheme.color['normal-background'])
         self.groupFonction('')
-
-    def color(self, type_, regex, foreground_, background_):
-        try:
-            self.textarea.tag_configure(type_, font=(self.font_active_now, 11, 'bold'), foreground=foreground_,
-                                        background=background_)
-            indices = self.textarea.findall(regex)
-
-            self.textarea.tag_add(type_, *indices)
-
-        except Exception as e:
-            pass
-
+    
     def autoIndent(self, e):
         """
         args Event

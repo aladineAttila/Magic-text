@@ -30,28 +30,44 @@ class Colorscheme:
         self.colorschemes = readColorscheme(path)
         self.color = self.colorschemes[title_colorschemes]
 
-        self.function = ('fonction',
-                         r"(abs|all|any|ascii|bin|bool|bytearray|bytes|callable|chr|classmethod|compile|complex"
-                         r"|delatrr|dir|divmod|enumerate|eval|exec|filter|float|format|getattr|globals|hasattr|hash"
-                         r"|help|hex|id|isinstance|issubclass|iter|len|locals|map|max|memoryview|min|next|object|oct"
-                         r"|open|ord|pow|print|property|range|repr|reversed|round|set|setattr|slice|sorted"
-                         r"|staticmethod|str|sum|super|type|vars|_import_|capitalize|casefold|center|count|encode"
-                         r"|endswith|expandtabs|find|format|format_map|index|input|int|isalnum|isalpha|isdecimal"
-                         r"|isdigit|isidentifier|islower|isnumeric|isprintable|isspace|istitle|isupper|join|ljust"
-                         r"|lower|lstrip|maketrans|partition|replace|rfind|rindex|rjust|rpartition|rsplit|rstrip"
-                         r"|slice|split|splitlines|startswith|strip|swapcase|title|translate|upper|zfill|function"
-                         r"|append|clear|copy|count|extend|index|insert|list|pop|remove|reverse|slice|sort|count"
-                         r"|index|slice|tuple|zip|add|clear|copy|difference|difference_update|discard|frozenset"
-                         r"|intersection|intersection_update|isdisjoint|issubset|issuperset|pop|remove|set|union"
-                         r"|update|clear|copy|dict|fromkeys|get|items|keys|pop|popitem|setdefault|update|values)",
-                         self.color['definition-foreground'], self.color['definition-background'])
+        self.function = (
+             'fonction',
+             r'(\w+\()',
+             self.color['definition-foreground'],
+             self.color['definition-background']
+         )
 
-        self.keyword = ('keyword', r'(if |elif |else:|def |for |while |try:|except|class|from |import | as | in '
-                                   r'|return )', self.color['keyword-foreground'], self.color['keyword-background'])
+        self.parenthese = (
+            "parenthese",
+            r"(\(|\))",
+            self.color["normal-foreground"],
+            self.color["normal-background"]
+        )
 
-        self.comment = ('comment', r'(#.+|""".+""")', self.color['comment-foreground'], self.color['comment-background'])
+        self.keyword = (
+            'keyword', 
+            r'(if |elif |else:|def |for |while |try:|except|class|from |import | as | in |return )',
+            self.color['keyword-foreground'], 
+            self.color['keyword-background']
+        )
 
-        self.char = ('char', r'(\'.+\')', self.color['string-foreground'], self.color['string-background'])
+        self.comment = (
+            'comment', 
+            r'(#.+|""".+""")', 
+            self.color['comment-foreground'], 
+            self.color['comment-background']
+        )
 
-        self.string = ('string', r'(".+")', self.color['string-foreground'], self.color['string-background'])
+        self.char = (
+            'char',
+            r'(\'.+\')', 
+            self.color['string-foreground'], 
+            self.color['string-background']
+        )
+
+        self.string = (
+            'string', r'(".+")', 
+            self.color['string-foreground'], 
+            self.color['string-background']
+        )
 
