@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import os
 from tkinter import (
-        Tk, Text, Listbox, Button, StringVar, END, Menu,
-        ACTIVE, Scrollbar, filedialog, PhotoImage
+        Tk, Text, Listbox, Button, StringVar, Menu,
+        Scrollbar, filedialog, PhotoImage
 )
 import customtkinter
 
@@ -14,8 +14,6 @@ customtkinter.set_default_color_theme("blue")
 
 BACKGROUND = "#181915"
 FOREGROUND = "white"
-TEXT_BACKGROUND = "#2C2E28"
-TEXT_FOREGROUND = "white"
 CURSOR = "white"
 MENU_BACKGROUND = "white"
 MENU_FOREGROUND = "#1E201C"
@@ -36,44 +34,46 @@ class App(customtkinter.CTk):
         self.main_frame = customtkinter.CTkFrame(self, bg=BACKGROUND)
 
         # left frame contient file_list
-        self.left_frame = customtkinter.CTkFrame(self.main_frame, bg=BACKGROUND)
-        self.enthete = customtkinter.CTkLabel(self.left_frame, bg=BACKGROUND, fg='#9E9F9B', text='FILES').pack(ipady=4)
+        self.left_frame = customtkinter.CTkFrame(self.main_frame, bg=BACKGROUND, height=0)
+        self.enthete = customtkinter.CTkLabel(self.left_frame, bg=BACKGROUND, fg='#9E9F9B', text='').pack(ipady=7)
         self.file_list = Listbox(self.left_frame, bg=self.colorscheme.color['normal-background'],
                                  fg=self.colorscheme.color['normal-foreground'], width=20, height=48)
         self.file_list.pack()
         self.left_frame.pack(side='left', fill='y')
 
         # right frame contient text editor and label button
-        # et le scrollbar et la linenumber
-        self.right = customtkinter.CTkFrame(self.main_frame, bg=BACKGROUND)
+        # et le yscrollbar et la linenumber
+        self.right_frame = customtkinter.CTkFrame(self.main_frame, bg=BACKGROUND)
 
         # top barre
-        self.frame_top_right = customtkinter.CTkFrame(self.right, bg=BACKGROUND, height=0)
+        self.frame_top_right = customtkinter.CTkFrame(self.right_frame, bg=BACKGROUND, height=0)
         self.file_name = StringVar()
         self.frame_top_right.pack(fill="x")
 
         # text editor
-        self.frame_bottom_right = customtkinter.CTkFrame(self.right)
-        self.scrollbar = Scrollbar(self.frame_bottom_right)
-        self.scrollbar.pack(side="right", fill='y')
-        self.line_number = Listbox(self.frame_bottom_right, width=1, height=31, font=(None, 11),
+        self.frame_bottom_right = customtkinter.CTkFrame(self.right_frame)
+        self.yscrollbar = Scrollbar(self.frame_bottom_right)
+        self.yscrollbar.pack(side="right", fill='y')
+        # self.xscrollbar = Scrollbar(self.right_frame)
+        # self.xscrollbar.pack(side="bottom")
+        self.line_number = Listbox(self.frame_bottom_right, width=1, height=30, font=(None, 11),
                                    fg=self.colorscheme.color['linenumber-foreground'],
                                    bg=self.colorscheme.color['linenumber-background'],
-                                   yscrollcommand=self.scrollbar.set)
+                                   yscrollcommand=self.yscrollbar.set)
         self.line_number.pack(side='left', fill='y')
         self.textarea = TextWithColorisation(self.frame_bottom_right, undo=True, autoseparators=True, maxundo=-1,
                                              fg=self.colorscheme.color['normal-foreground'],
-                                             bg=self.colorscheme.color['normal-background'], width=1000, height=31,
-                                             yscrollcommand=self.scrollbar.set)
+                                             bg=self.colorscheme.color['normal-background'], width=700, height=31,
+                                             yscrollcommand=self.yscrollbar.set)
         self.textarea.pack(side='left', fill='y')
-        self.scrollbar.config(command=self.scrollYview)
+        self.yscrollbar.config(command=self.scrollYview)
         self.font_active_now = 'Courier New'
         self.textarea.configure(insertbackground=self.colorscheme.color['cursor-foreground'], font=('Courier New', 11))
         self.frame_bottom_right.pack(side='top', fill='y', expand=1)
 
         # terminal
-        self.terminal = Text(self.right, bg=BACKGROUND, fg=FOREGROUND, font=('Courier New', 10))
-        self.right.pack(side='right', fill='y')
+        self.terminal = Text(self.right_frame, bg=BACKGROUND, fg=FOREGROUND, font=('Courier New', 10))
+        self.right_frame.pack(side='right', fill='y')
 
         self.main_frame.pack(fill='x')
 
@@ -154,7 +154,7 @@ class App(customtkinter.CTk):
             pass
 
     def ctrlS(self, e: str) -> None:
-        self.saveFile(self.textarea.get(1.0, END), self.file_active_now)
+        self.saveFile(self.textarea.get(1.0, 'end'), self.file_active_now)
 
     def ctrlB(self, e: str) -> None:
         self.hideAndShowTerminal('show')
@@ -165,7 +165,7 @@ class App(customtkinter.CTk):
 
     def fillOut(self, e: str) -> None:
         try:
-            self.activeFile(self.dic[self.file_list.get(ACTIVE)])
+            self.activeFile(self.dic[self.file_list.get('active')])
         except:
             pass
 
@@ -187,9 +187,9 @@ class App(customtkinter.CTk):
         file_name = directory.split('/')[-1]
         if self.file_active_now != file_name:
             self.file_active_now = file_name
-            self.textarea.delete(1.0, END)
+            self.textarea.delete(1.0, 'end')
             with open(directory, 'r') as file_text:
-                self.textarea.insert(END, file_text.read())
+                self.textarea.insert('end', file_text.read())
             self.title(f'{directory} - magic-text')
         self.groupFonction('<KeyRelease>')
 
@@ -218,13 +218,20 @@ class App(customtkinter.CTk):
             if name not in self.dic:
                 self.dic[name] = directory
                 self.title(f'{directory} - magic-text')
-                self.file_list.insert(END, name)
-                self.textarea.delete(1.0, END)
-                self.textarea.insert(END, content)
+                self.file_list.insert('end', name)
+                self.textarea.delete(1.0, 'end')
+                self.textarea.insert('end', content)
                 self.groupFonction('<KeyRelease>')
-                Button(self.frame_top_right, text=name, relief='flat',
-                       command=lambda: (self.activeFile(self.dic[name])), bg=TEXT_BACKGROUND, fg='white',
-                       width=15).pack(side='left', ipady=4)
+                button = Button(
+                       self.frame_top_right,
+                       text=name,
+                       relief='flat',
+                       fg="white",
+                       bg=BACKGROUND,
+                       command=lambda: (self.activeFile(self.dic[name])),
+                       width=15
+               )\
+               .pack(side='left', ipady=4)
 
     def saveFile(self, content: str, file_name: str=None) -> str:
         """
@@ -265,16 +272,16 @@ class App(customtkinter.CTk):
         :param mode:
         :return: None
         """
-        code = self.textarea.get(1.0, END)
+        code = self.textarea.get(1.0, 'end')
         if file_path:
             if mode == "buildAndWrite":
                 with open(file_path, 'w') as code_file:
                     code_file.write(code)
         else:
-            file_path = self.saveFile(content=self.textarea.get(1.0, END))
+            file_path = self.saveFile(content=self.textarea.get(1.0, 'end'))
         output = os.popen(f'python {file_path}').read()
-        self.terminal.delete(1.0, END)
-        self.terminal.insert(END, output)
+        self.terminal.delete(1.0, 'end')
+        self.terminal.insert('end', output)
 
     def openFile(self) -> tuple:
         """
@@ -331,11 +338,11 @@ class App(customtkinter.CTk):
 
         :return: None
         """
-        self.line_number.delete(0, END)
-        line = len(self.textarea.get(1.0, END).split('\n'))
+        self.line_number.delete(0, 'end')
+        line = len(self.textarea.get(1.0, 'end').split('\n'))
         list = []
         for i in range(1, line):
-            self.line_number.insert(END, str(i))
+            self.line_number.insert('end', str(i))
             list.append(i)
         self.line_number.config(width=len(str(max(list))))
 
