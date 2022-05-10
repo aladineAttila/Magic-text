@@ -33,49 +33,36 @@ class App(customtkinter.CTk):
         # customtkinter.CTkFrame principal
         self.main_frame = customtkinter.CTkFrame(self, bg=BACKGROUND)
 
-        # left frame contient file_list
-        self.left_frame = customtkinter.CTkFrame(self.main_frame, bg=BACKGROUND, height=0)
-        self.enthete = customtkinter.CTkLabel(self.left_frame, bg=BACKGROUND, fg='#9E9F9B', text='').pack(ipady=7)
-        self.file_list = Listbox(self.left_frame, bg=self.colorscheme.color['normal-background'],
-                                 fg=self.colorscheme.color['normal-foreground'], width=20, height=48)
-        self.file_list.pack()
-        self.left_frame.pack(side='left', fill='y')
-
         # right frame contient text editor and label button
         # et le yscrollbar et la linenumber
-        self.right_frame = customtkinter.CTkFrame(self.main_frame, bg=BACKGROUND)
 
         # top barre
-        self.frame_top_right = customtkinter.CTkFrame(self.right_frame, bg=BACKGROUND, height=0)
+        self.frame_top = customtkinter.CTkFrame(self.main_frame, bg=BACKGROUND, height=0)
         self.file_name = StringVar()
-        self.frame_top_right.pack(fill="x")
+        self.frame_top.pack(fill="x")
 
         # text editor
-        self.frame_bottom_right = customtkinter.CTkFrame(self.right_frame)
-        self.yscrollbar = Scrollbar(self.frame_bottom_right)
+        self.frame_bottom = customtkinter.CTkFrame(self.main_frame)
+        self.yscrollbar = Scrollbar(self.frame_bottom)
         self.yscrollbar.pack(side="right", fill='y')
         # self.xscrollbar = Scrollbar(self.right_frame)
         # self.xscrollbar.pack(side="bottom")
-        self.line_number = Listbox(self.frame_bottom_right, width=1, height=30, font=(None, 11),
+        self.line_number = Listbox(self.frame_bottom, width=1, height=90, font=(None, 11),
                                    fg=self.colorscheme.color['linenumber-foreground'],
                                    bg=self.colorscheme.color['linenumber-background'],
                                    yscrollcommand=self.yscrollbar.set)
         self.line_number.pack(side='left', fill='y')
-        self.textarea = TextWithColorisation(self.frame_bottom_right, undo=True, autoseparators=True, maxundo=-1,
+        self.textarea = TextWithColorisation(self.frame_bottom, undo=True, autoseparators=True, maxundo=-1,
                                              fg=self.colorscheme.color['normal-foreground'],
-                                             bg=self.colorscheme.color['normal-background'], width=700, height=31,
+                                             bg=self.colorscheme.color['normal-background'], width=700, height=90,
                                              yscrollcommand=self.yscrollbar.set)
         self.textarea.pack(side='left', fill='y')
         self.yscrollbar.config(command=self.scrollYview)
         self.font_active_now = 'Courier New'
         self.textarea.configure(insertbackground=self.colorscheme.color['cursor-foreground'], font=('Courier New', 11))
-        self.frame_bottom_right.pack(side='top', fill='y', expand=1)
+        self.frame_bottom.pack(fill='y')
 
-        # terminal
-        self.terminal = Text(self.right_frame, bg=BACKGROUND, fg=FOREGROUND, font=('Courier New', 10))
-        self.right_frame.pack(side='right', fill='y')
-
-        self.main_frame.pack(fill='x')
+        self.main_frame.pack(fill='y')
 
         # Barre de menu
         self.menu = Menu(self, bg=MENU_BACKGROUND, fg=MENU_FOREGROUND)
@@ -86,21 +73,12 @@ class App(customtkinter.CTk):
 
         # add menu file into menu
         self.menu.add_cascade(label='File', menu=self.menu_file)
-        self.menu.add_cascade(label='View', menu=self.menu_view)
-        self.menu.add_cascade(label='Tools', menu=self.menu_tools)
         self.menu.add_cascade(label='Preference', menu=self.menu_preference)
 
         # menu file
-        self.menu_file.add_command(label='Save Ctrl+S', command=lambda: self.ctrlS('<Control+s>'))
-        self.menu_file.add_command(label='Open file Ctrl+O', command=self.insertion)
-        self.menu_file.add_command(label='Quit Ctrl+Q', command=self.quit)
-
-        # menu view
-        self.menu_view.add_command(label="Show terminal Ctrl+T", command=lambda: self.hideAndShowTerminal('show'))
-        self.menu_view.add_command(label='Hide terminal Ctrl+T', command=lambda: self.hideAndShowTerminal('hide'))
-
-        # menu tools
-        self.menu_tools.add_command(label='Build Ctrl+B', command=lambda: self.ctrlB('<Control-b>'))
+        self.menu_file.add_command(label='Save File Ctrl+S', command=lambda: self.ctrlS('<Control+s>'))
+        self.menu_file.add_command(label='Open File Ctrl+O', command=self.insertion)
+        self.menu_file.add_command(label='Close Ctrl+Q', command=self.quit)
 
         # preference
         self.menu_font = Menu(self.menu_preference, bg=MENU_BACKGROUND, fg=MENU_FOREGROUND, tearoff=0)
@@ -110,8 +88,8 @@ class App(customtkinter.CTk):
         # font_tuple = font.families()
         font_tuple = ("Comic Sans MS", "Courier New", "Helvetica", "Times New Roman")
 
-        # for font_family in font_tuple:
-        #     self.menu_font.add_command(label=font_family, command=lambda:self.changeFont(font_family))
+        for font_family in font_tuple:
+             self.menu_font.add_command(label=font_family, command=lambda:self.changeFont(font_family))
         # self.menu_font.add_command(label=font_tuple[0], command=lambda:self.changeFont(font_tuple[0]))
         # self.menu_font.add_command(label=font_tuple[1], command=lambda:self.changeFont(font_tuple[1]))
         # self.menu_font.add_command(label=font_tuple[2], command=lambda:self.changeFont(font_tuple[2]))
@@ -133,9 +111,7 @@ class App(customtkinter.CTk):
 
         # key binding
         self.textarea.bind('<KeyRelease>', self.groupFonction)
-        self.file_list.bind('<<ListboxSelect>>', self.fillOut)
         self.bind('<Control-s>', self.ctrlS)
-        self.bind('<Control-b>', self.ctrlB)
         self.bind('<Control-o>', (lambda e: self.insertion()))
         self.bind('<Control-q>', (lambda e: self.quit()))
         self.bind('<Control-y>', self.ctrlY)
@@ -156,18 +132,6 @@ class App(customtkinter.CTk):
     def ctrlS(self, e: str) -> None:
         self.saveFile(self.textarea.get(1.0, 'end'), self.file_active_now)
 
-    def ctrlB(self, e: str) -> None:
-        self.hideAndShowTerminal('show')
-        try:
-            self.build(self.dic[self.file_active_now], 'buildAndWrite')
-        except:
-            self.build(None, 'buildAndWrite')
-
-    def fillOut(self, e: str) -> None:
-        try:
-            self.activeFile(self.dic[self.file_list.get('active')])
-        except:
-            pass
 
     def changeFont(self, font_family: str) -> None:
         self.font_active_now = font_family
@@ -218,12 +182,11 @@ class App(customtkinter.CTk):
             if name not in self.dic:
                 self.dic[name] = directory
                 self.title(f'{directory} - magic-text')
-                self.file_list.insert('end', name)
                 self.textarea.delete(1.0, 'end')
                 self.textarea.insert('end', content)
                 self.groupFonction('<KeyRelease>')
                 button = Button(
-                       self.frame_top_right,
+                       self.frame_top,
                        text=name,
                        relief='flat',
                        fg="white",
@@ -257,31 +220,6 @@ class App(customtkinter.CTk):
                     return files.name
         except AttributeError:
             pass
-
-    def build(self, file_path: str, mode: str=None) -> None:
-        """
-        1- get text content
-        2- verify is file_path exist
-            write content in code_file
-            or
-            call fonction saveFile
-        3- exectute code_file in file_path
-        4- print her output
-
-        :param file_path:
-        :param mode:
-        :return: None
-        """
-        code = self.textarea.get(1.0, 'end')
-        if file_path:
-            if mode == "buildAndWrite":
-                with open(file_path, 'w') as code_file:
-                    code_file.write(code)
-        else:
-            file_path = self.saveFile(content=self.textarea.get(1.0, 'end'))
-        output = os.popen(f'python {file_path}').read()
-        self.terminal.delete(1.0, 'end')
-        self.terminal.insert('end', output)
 
     def openFile(self) -> tuple:
         """
@@ -357,13 +295,15 @@ class App(customtkinter.CTk):
 
     def change_colorsheme(self, title_colorschemes):
         self.colorscheme = Colorscheme(f'{CURRENT_DIRECTORY}/plugin/colorshemes', title_colorschemes)
-        self.textarea.config(fg=self.colorscheme.color['normal-foreground'],
-                             bg=self.colorscheme.color['normal-background'],
-                             insertbackground=self.colorscheme.color['cursor-foreground'])
-        self.line_number.config(fg=self.colorscheme.color['linenumber-foreground'],
-                                bg=self.colorscheme.color['linenumber-background'])
-        self.file_list.config(fg=self.colorscheme.color['normal-foreground'],
-                              bg=self.colorscheme.color['normal-background'])
+        self.textarea.config(
+                fg=self.colorscheme.color['normal-foreground'],
+                bg=self.colorscheme.color['normal-background'],
+                insertbackground=self.colorscheme.color['cursor-foreground']
+        )
+        self.line_number.config(
+                fg=self.colorscheme.color['linenumber-foreground'],
+                bg=self.colorscheme.color['linenumber-background']
+        )
         self.groupFonction('')
     
     def autoIndent(self, e):
