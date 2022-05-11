@@ -9,8 +9,6 @@ import customtkinter
 from mywidget.text import TextWithColorisation
 from plugin.colorshemes import Colorscheme
 
-customtkinter.set_appearance_mode("System")
-customtkinter.set_default_color_theme("blue")
 
 BACKGROUND = "#181915"
 FOREGROUND = "white"
@@ -19,6 +17,8 @@ MENU_BACKGROUND = "white"
 MENU_FOREGROUND = "#1E201C"
 CURRENT_DIRECTORY = os.path.abspath('.')
 
+customtkinter.set_appearance_mode("dark")
+customtkinter.set_default_color_theme(f"{CURRENT_DIRECTORY}/plugin/mycustomTheme.json")
 
 class App(customtkinter.CTk):
     def __init__(self):
@@ -27,7 +27,7 @@ class App(customtkinter.CTk):
         self.geometry("1000x800")
         self.dic = {}
         self.file_active_now = None
-        self.call('wm', 'iconphoto', self._w, PhotoImage(file='sublike.png'))
+        self.call('wm', 'iconphoto', self._w, PhotoImage(file=f'{CURRENT_DIRECTORY}/sublike.png'))
         self.colorscheme = Colorscheme(f'{CURRENT_DIRECTORY}/plugin/colorshemes', 'IDLE Classic')
 
         # customtkinter.CTkFrame principal
@@ -222,12 +222,9 @@ class App(customtkinter.CTk):
                 self.textarea.delete(1.0, 'end')
                 self.textarea.insert('end', content)
                 self.groupFonction('<KeyRelease>')
-                button = Button(
+                button = customtkinter.CTkButton(
                        self.frame_top_right,
                        text=name,
-                       relief='flat',
-                       fg="white",
-                       bg=BACKGROUND,
                        command=lambda: (self.activeFile(self.dic[name])),
                        width=15
                )\
@@ -279,7 +276,7 @@ class App(customtkinter.CTk):
                     code_file.write(code)
         else:
             file_path = self.saveFile(content=self.textarea.get(1.0, 'end'))
-        output = os.popen(f'python {file_path}').read()
+        output = os.popen(f'python3 {file_path}').read()
         self.terminal.delete(1.0, 'end')
         self.terminal.insert('end', output)
 
