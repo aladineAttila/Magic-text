@@ -17,8 +17,7 @@ MENU_BACKGROUND = "white"
 MENU_FOREGROUND = "#1E201C"
 CURRENT_DIRECTORY = os.path.abspath('.')
 
-customtkinter.set_appearance_mode("dark")
-customtkinter.set_default_color_theme(f"{CURRENT_DIRECTORY}/plugin/mycustomTheme.json")
+customtkinter.set_appearance_mode("System")
 
 class App(customtkinter.CTk):
     def __init__(self):
@@ -27,8 +26,11 @@ class App(customtkinter.CTk):
         self.geometry("1000x800")
         self.dic = {}
         self.file_active_now = None
-        self.call('wm', 'iconphoto', self._w, PhotoImage(file=f'{CURRENT_DIRECTORY}/sublike.png'))
-        self.colorscheme = Colorscheme(f'{CURRENT_DIRECTORY}/plugin/colorshemes', 'IDLE Classic')
+        self.call('wm', 'iconphoto', self._w, PhotoImage(file=os.path.join(CURRENT_DIRECTORY, 'sublike.png')))
+        self.colorscheme = Colorscheme(
+            path=os.path.join(CURRENT_DIRECTORY, 'plugin/colorshemes'),
+            title_colorschemes='IDLE Classic'
+        )
 
         # customtkinter.CTkFrame principal
         self.main_frame = customtkinter.CTkFrame(self, bg=BACKGROUND)
@@ -225,10 +227,11 @@ class App(customtkinter.CTk):
                 button = customtkinter.CTkButton(
                        self.frame_top_right,
                        text=name,
+                       fg_color=("gray", "gray"),
                        command=lambda: (self.activeFile(self.dic[name])),
                        width=15
                )\
-               .pack(side='left', ipady=4)
+               .pack(side='left', ipady=4, ipadx=10)
 
     def saveFile(self, content: str, file_name: str=None) -> str:
         """
@@ -346,7 +349,6 @@ class App(customtkinter.CTk):
     def groupFonction(self, e):
         self.color(*self.colorscheme.keyword)
         self.color(*self.colorscheme.function)
-        self.color(*self.colorscheme.parenthese)
         self.color(*self.colorscheme.char)
         self.color(*self.colorscheme.string)
         self.color(*self.colorscheme.comment)
@@ -374,17 +376,20 @@ class App(customtkinter.CTk):
         :return: break
         """
         end_line = self.textarea.get('insert linestart', 'insert lineend')
-        tab = len([t for t in end_line.split('    ') if t == ''])
-        try:
-            if end_line[-1] == ':':
-                self.textarea.insert('insert', "\n" + "    " * (tab + 1))
-            else:
-                self.textarea.insert('insert', "\n" + "    " * tab)
-            return 'break'
-        except IndexError:
+        if len(end_line.strip("\t")):
+            tab = len([t for t in end_line.split('\t') if t == ''])
+            try:
+                if end_line[-1] == ':':
+                    self.textarea.insert('insert', "\n" + "\t" * (tab + 1))
+                else:
+                    self.textarea.insert('insert', "\n" + "\t" * tab)
+                return 'break'
+            except IndexError:
+                pass
+        else:
             pass
-
 
 if __name__ == "__main__":
     app = App()
     app.mainloop()
+

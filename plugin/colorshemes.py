@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from dataclasses import dataclass
 
 def generateDict(themes):
     themes = [elt.split('\n') for elt in themes.split("\n\n")]
@@ -32,17 +33,10 @@ class Colorscheme:
 
         self.function = (
              'fonction',
-             r'(\w+\()',
+             r'(\w+)(?=\s?\()',
              self.color['definition-foreground'],
              self.color['definition-background']
          )
-
-        self.parenthese = (
-            "parenthese",
-            r"(\(|\))",
-            self.color["normal-foreground"],
-            self.color["normal-background"]
-        )
 
         self.keyword = (
             'keyword', 
