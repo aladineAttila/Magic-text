@@ -10,7 +10,7 @@ createWorkSpace(){
 }
 
 buildProjet(){
-	pyinstaller src/sublLike.py
+	pyinstaller magic/sublLike.py
 }
 
 initGlobalVariable(){

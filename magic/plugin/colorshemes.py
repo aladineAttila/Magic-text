@@ -39,29 +39,29 @@ class Colorscheme:
          )
 
         self.keyword = (
-            'keyword', 
+            'keyword',
             r'(if |elif |else:|def |for |while |try:|except|class|from |import | as | in |return )',
-            self.color['keyword-foreground'], 
+            self.color['keyword-foreground'],
             self.color['keyword-background']
         )
 
         self.comment = (
-            'comment', 
-            r'(#.+|""".+""")', 
-            self.color['comment-foreground'], 
+            'comment',
+            r'(#.+|""".+""")',
+            self.color['comment-foreground'],
             self.color['comment-background']
         )
 
         self.char = (
             'char',
-            r'(\'.+\')', 
-            self.color['string-foreground'], 
+            r'(\'.+\')',
+            self.color['string-foreground'],
             self.color['string-background']
         )
 
         self.string = (
-            'string', r'(".+")', 
-            self.color['string-foreground'], 
+            'string', r'(".+")',
+            self.color['string-foreground'],
             self.color['string-background']
         )
 
