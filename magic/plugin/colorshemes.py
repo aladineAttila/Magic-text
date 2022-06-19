@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from dataclasses import dataclass
 
 def generateDict(themes):
     themes = [elt.split('\n') for elt in themes.split("\n\n")]
@@ -32,42 +33,35 @@ class Colorscheme:
 
         self.function = (
              'fonction',
-             r'(\w+\()',
+             r'(\w+)(?=\s?\()',
              self.color['definition-foreground'],
              self.color['definition-background']
          )
 
-        self.parenthese = (
-            "parenthese",
-            r"(\(|\))",
-            self.color["normal-foreground"],
-            self.color["normal-background"]
-        )
-
         self.keyword = (
-            'keyword', 
+            'keyword',
             r'(if |elif |else:|def |for |while |try:|except|class|from |import | as | in |return )',
-            self.color['keyword-foreground'], 
+            self.color['keyword-foreground'],
             self.color['keyword-background']
         )
 
         self.comment = (
-            'comment', 
-            r'(#.+|""".+""")', 
-            self.color['comment-foreground'], 
+            'comment',
+            r'(#.+|""".+""")',
+            self.color['comment-foreground'],
             self.color['comment-background']
         )
 
         self.char = (
             'char',
-            r'(\'.+\')', 
-            self.color['string-foreground'], 
+            r'(\'.+\')',
+            self.color['string-foreground'],
             self.color['string-background']
         )
 
         self.string = (
-            'string', r'(".+")', 
-            self.color['string-foreground'], 
+            'string', r'(".+")',
+            self.color['string-foreground'],
             self.color['string-background']
         )
 

@@ -1,1 +1,5 @@
-mywidget/__pycache__/
+magic/mycustomwidget/__pycache__/
+magic/plugin/__pycache__/
+magic/__pycache__/
+build/
+sublLike.spec

@@ -1,0 +1,244 @@
+from magicgui import *
+
+class FGuiMagic(GuiMagic):
+    def __init__(self):
+        super().__init__()
+
+        self.yscrollbar.config(command=self.scrollYview)
+
+        # menu file
+        self.menu_file.add_command(label='Save Ctrl+S', command=lambda: self.ctrlS('<Control+s>'))
+        self.menu_file.add_command(label='Open file Ctrl+O', command=self.insertion)
+        self.menu_file.add_command(label='Quit Ctrl+Q', command=self.quit)
+
+        # menu view
+        self.menu_view.add_command(label="Show terminal Ctrl+T", command=lambda: self.hideAndShowTerminal('show'))
+        self.menu_view.add_command(label='Hide terminal Ctrl+T', command=lambda: self.hideAndShowTerminal('hide'))
+
+        # menu tools
+        self.menu_tools.add_command(label='Build Ctrl+B', command=lambda: self.ctrlB('<Control-b>'))
+
+        self.the_color = [color for color in self.colorscheme.colorschemes]
+
+        self.menu_colorscheme.add_command(
+                label=self.the_color[0],
+                command=lambda: self.change_colorsheme(self.the_color[0])
+        )
+        self.menu_colorscheme.add_command(
+                label=self.the_color[1],
+                command=lambda: self.change_colorsheme(self.the_color[1])
+        )
+        self.menu_colorscheme.add_command(
+                label=self.the_color[2],
+                command=lambda: self.change_colorsheme(self.the_color[2])
+        )
+        self.menu_colorscheme.add_command(
+                label=self.the_color[3],
+                command=lambda: self.change_colorsheme(self.the_color[3])
+        )
+
+        self.config(menu=self.menu, bg=MENU_BACKGROUND_COLOR)
+
+        self.textarea.bind('<KeyRelease>', self.groupFonction)
+        self.file_list.bind('<<ListboxSelect>>', self.fillOut)
+        self.textarea.bind('<Return>', self.autoIndent)
+
+        self.bind('<Control-s>', self.ctrlS)
+        self.bind('<Control-b>', self.ctrlB)
+        self.bind('<Control-o>', (lambda e: self.insertion()))
+        self.bind('<Control-q>', (lambda e: self.quit()))
+        self.bind('<Control-y>', self.ctrlY)
+
+        self.term_mod = 'show'
+        self.bind('<Control-t>', (lambda e: self.hideAndShowTerminal(self.term_mod)))
+
+    def scrollYview(self, *args):
+        self.line_number.yview(*args)
+        self.textarea.yview(*args)
+
+    def ctrlY(self, event: str) -> None:
+        try:
+            self.textarea.edit_redo()
+        except:
+            pass
+
+    def hideAndShowTerminal(self, mode):
+        try:
+            if mode == "show":
+                self.term_mod = 'hide'
+                self.terminal.pack(side='bottom', fill='x', ipady=5)
+            elif mode == "hide":
+                self.term_mod = 'show'
+                self.terminal.forget()
+        except:
+            pass
+
+    def ctrlB(self, event: str) -> None:
+        self.hideAndShowTerminal('show')
+        try:
+            self.build(self.files_dictionary[self.file_active_now], 'buildAndWrite')
+        except:
+            self.build(None, 'buildAndWrite')
+
+    def fillOut(self, event: str) -> None:
+        try:
+            self.activeFile(self.files_dictionary[self.file_list.get('active')])
+        except:
+            pass
+
+    def changeFont(self, font_family: str) -> None:
+        self.font_active_now = font_family
+        self.textarea.configure(font=(font_family, 11))
+
+    def activeFile(self, directory: str) -> None:
+        os.chdir('/'.join(directory.split('/')[:-1]))  # change the current directory
+        file_name = directory.split('/')[-1]
+        if self.file_active_now != file_name:
+            self.file_active_now = file_name
+            self.textarea.delete(1.0, 'end')
+            with open(directory, 'r') as file_text:
+                self.textarea.insert('end', file_text.read())
+            self.title(f'{directory} - magic-text')
+        self.groupFonction('<KeyRelease>')
+
+    def insertion(self, mode: str=None, name: str=None, content: str=None, directory: str=None) -> None:
+        if mode is None:
+            name, content, directory = self.openFile()
+
+        if name and content and directory:
+            self.file_active_now = name
+            if name not in self.files_dictionary:
+                self.files_dictionary[name] = directory
+                self.title(f'{directory} - magic-text')
+                self.file_list.insert('end', name)
+                self.textarea.delete(1.0, 'end')
+                self.textarea.insert('end', content)
+                self.groupFonction('<KeyRelease>')
+                button = customtkinter.CTkButton(
+                       self.frame_top_right,
+                       text=name,
+                       fg_color=("#272822", "#272822"),
+                       command=lambda: (self.activeFile(self.files_dictionary[name])),
+                       width=15
+               )\
+               .pack(side='left', ipady=4, ipadx=10)
+
+    def ctrlS(self, event: str) -> None:
+        self.saveFile(self.textarea.get(1.0, 'end'), self.file_active_now)
+
+    def saveFile(self, content: str, file_name: str=None) -> str:
+        try:
+            if file_name is None:
+                files = filedialog.asksaveasfile(title='entre le nom de votre fichier', mode='w')
+                with open(files.name, 'w') as file_text:
+                    file_text.write(content)
+                    file_name = files.name.split('/')[-1]
+                    self.insertion('', file_name, content, files.name)
+                    return files.name
+
+            else:
+                with open(f"{file_name}", 'w') as file_text:
+                    file_text.write(content)
+                    return files.name
+        except AttributeError:
+            pass
+
+    def build(self, file_path: str, mode: str=None) -> None:
+        code = self.textarea.get(1.0, 'end')
+        if file_path:
+            if mode == "buildAndWrite":
+                with open(file_path, 'w') as code_file:
+                    code_file.write(code)
+        else:
+            file_path = self.saveFile(content=self.textarea.get(1.0, 'end'))
+        output = os.popen(f'python3 {file_path}').read()
+        self.terminal.delete(1.0, 'end')
+        self.terminal.insert('end', output)
+
+    def openFile(self) -> tuple:
+        try:
+            files = filedialog.askopenfiles(
+                    title='select file to open on magic-text',
+                    mode='rb'
+            )
+            os.chdir('/'.join(files[0].name.split('/')[:-1]))
+            for file_ in files:
+                with open(file_.name, 'r') as file_text:
+                    name = file_.name.split("/")[-1]
+                    content = file_text.read()
+                    path = file_.name
+                    return name, content, path
+        except:
+            return None, None, None
+
+    def color(self, type_, regex, foreground_, background_):
+        try:
+            self.textarea.tag_configure(
+                    type_, font=(self.font_active_now, 11, 'bold'),
+                    foreground=foreground_, background=background_
+            )
+
+            indices = self.textarea.findall(regex)
+
+            self.textarea.tag_add(type_, *indices)
+
+        except Exception as e:
+            pass
+
+    def updateLineNumber(self):
+        self.line_number.delete(0, 'end')
+        line = len(self.textarea.get(1.0, 'end').split('\n'))
+        list = []
+        for i in range(1, line):
+            self.line_number.insert('end', str(i))
+            list.append(i)
+        self.line_number.config(width=len(str(max(list))))
+
+    def groupFonction(self, event):
+        self.updateLineNumber()
+        self.color(*self.colorscheme.keyword)
+        self.color(*self.colorscheme.function)
+        self.color(*self.colorscheme.char)
+        self.color(*self.colorscheme.string)
+        self.color(*self.colorscheme.comment)
+
+    def change_colorsheme(self, title_colorschemes):
+        self.groupFonction('<KeyRelease>')
+
+        self.colorscheme = Colorscheme(
+                f'{CURRENT_DIRECTORY}/plugin/colorshemes',
+                title_colorschemes
+        )
+        self.textarea.config(
+                fg=self.colorscheme.color['normal-foreground'],
+                bg=self.colorscheme.color['normal-background'],
+                insertbackground=self.colorscheme.color['cursor-foreground']
+        )
+        self.line_number.config(
+                fg=self.colorscheme.color['linenumber-foreground'],
+                bg=self.colorscheme.color['linenumber-background']
+        )
+        self.file_list.config(
+                fg=self.colorscheme.color['normal-foreground'],
+                bg=self.colorscheme.color['normal-background']
+        )
+
+    def autoIndent(self, e):
+        end_line = self.textarea.get('insert linestart', 'insert lineend')
+        if len(end_line.strip("\t")):
+            tab = len([t for t in end_line.split('\t') if t == ''])
+            try:
+                if end_line[-1] == ':':
+                    self.textarea.insert('insert', "\n" + "\t" * (tab + 1))
+                else:
+                    self.textarea.insert('insert', "\n" + "\t" * tab)
+                return 'break'
+            except IndexError:
+                pass
+        else:
+            pass
+
+
+if __name__ == "__main__":
+    fguimagic = FGuiMagic()
+    fguimagic.mainloop()
