@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-from magicfunction import FGuiMagic
+from magicfunction import MagicFonctionalityWithGui
 
 def main():
-    app = FGuiMagic()
+    app = MagicFonctionalityWithGui()
     app.mainloop()
 
 if __name__ == "__main__":

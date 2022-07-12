@@ -1,6 +1,6 @@
 from magicgui import *
 
-class FGuiMagic(GuiMagic):
+class MagicFonctionalityWithGui(MagicGui):
     def __init__(self):
         super().__init__()
 
@@ -8,7 +8,7 @@ class FGuiMagic(GuiMagic):
 
         # menu file
         self.menu_file.add_command(label='Save Ctrl+S', command=lambda: self.ctrlS('<Control+s>'))
-        self.menu_file.add_command(label='Open file Ctrl+O', command=self.insertion)
+        self.menu_file.add_command(label='Open file Ctrl+O', command=self.insertContentOnTextarea)
         self.menu_file.add_command(label='Quit Ctrl+Q', command=self.quit)
 
         # menu view
@@ -18,34 +18,40 @@ class FGuiMagic(GuiMagic):
         # menu tools
         self.menu_tools.add_command(label='Build Ctrl+B', command=lambda: self.ctrlB('<Control-b>'))
 
+        self.font = ('mononoki', 'ubuntu')
+
+        self.menu_font.add_command(label=self.font[0], command=lambda: self.changeFont(self.font[0]))
+        self.menu_font.add_command(label=self.font[1], command=lambda: self.changeFont(self.font[1]))
+
+
         self.the_color = [color for color in self.colorscheme.colorschemes]
 
         self.menu_colorscheme.add_command(
                 label=self.the_color[0],
-                command=lambda: self.change_colorsheme(self.the_color[0])
+                command=lambda: self.changeColorscheme(self.the_color[0])
         )
         self.menu_colorscheme.add_command(
                 label=self.the_color[1],
-                command=lambda: self.change_colorsheme(self.the_color[1])
+                command=lambda: self.changeColorscheme(self.the_color[1])
         )
         self.menu_colorscheme.add_command(
                 label=self.the_color[2],
-                command=lambda: self.change_colorsheme(self.the_color[2])
+                command=lambda: self.changeColorscheme(self.the_color[2])
         )
         self.menu_colorscheme.add_command(
                 label=self.the_color[3],
-                command=lambda: self.change_colorsheme(self.the_color[3])
+                command=lambda: self.changeColorscheme(self.the_color[3])
         )
 
         self.config(menu=self.menu, bg=MENU_BACKGROUND_COLOR)
 
-        self.textarea.bind('<KeyRelease>', self.groupFonction)
+        self.textarea.bind('<KeyRelease>', self.updateTheLineNumberAndColorText)
         self.file_list.bind('<<ListboxSelect>>', self.fillOut)
         self.textarea.bind('<Return>', self.autoIndent)
 
         self.bind('<Control-s>', self.ctrlS)
         self.bind('<Control-b>', self.ctrlB)
-        self.bind('<Control-o>', (lambda e: self.insertion()))
+        self.bind('<Control-o>', (lambda e: self.insertContentOnTextarea()))
         self.bind('<Control-q>', (lambda e: self.quit()))
         self.bind('<Control-y>', self.ctrlY)
 
@@ -88,7 +94,8 @@ class FGuiMagic(GuiMagic):
 
     def changeFont(self, font_family: str) -> None:
         self.font_active_now = font_family
-        self.textarea.configure(font=(font_family, 11))
+        self.textarea.configure(font=(font_family, self.font_size))
+        # print(font_family)
 
     def activeFile(self, directory: str) -> None:
         os.chdir('/'.join(directory.split('/')[:-1]))  # change the current directory
@@ -99,12 +106,10 @@ class FGuiMagic(GuiMagic):
             with open(directory, 'r') as file_text:
                 self.textarea.insert('end', file_text.read())
             self.title(f'{directory} - magic-text')
-        self.groupFonction('<KeyRelease>')
+        self.updateTheLineNumberAndColorText('<KeyRelease>')
 
-    def insertion(self, mode: str=None, name: str=None, content: str=None, directory: str=None) -> None:
-        if mode is None:
-            name, content, directory = self.openFile()
-
+    def insertContentOnTextarea(self, name: str=None, content: str=None, directory: str=None) -> None:
+        name, content, directory = self.openFile()
         if name and content and directory:
             self.file_active_now = name
             if name not in self.files_dictionary:
@@ -113,7 +118,7 @@ class FGuiMagic(GuiMagic):
                 self.file_list.insert('end', name)
                 self.textarea.delete(1.0, 'end')
                 self.textarea.insert('end', content)
-                self.groupFonction('<KeyRelease>')
+                self.updateTheLineNumberAndColorText('<KeyRelease>')
                 button = customtkinter.CTkButton(
                        self.frame_top_right,
                        text=name,
@@ -126,20 +131,22 @@ class FGuiMagic(GuiMagic):
     def ctrlS(self, event: str) -> None:
         self.saveFile(self.textarea.get(1.0, 'end'), self.file_active_now)
 
-    def saveFile(self, content: str, file_name: str=None) -> str:
+    def saveFile(self, content: str, file_path: str=None) -> str:
         try:
-            if file_name is None:
+            if file_path is None:
                 files = filedialog.asksaveasfile(title='entre le nom de votre fichier', mode='w')
+                file_path = files.name
                 with open(files.name, 'w') as file_text:
                     file_text.write(content)
-                    file_name = files.name.split('/')[-1]
-                    self.insertion('', file_name, content, files.name)
-                    return files.name
+                    name_of_file = file_path.split('/')[-1]
+                    self.insertContentOnTextarea(name_of_file, content, file_path)
+                    return file_path
 
             else:
-                with open(f"{file_name}", 'w') as file_text:
+                with open(f"{file_path}", 'w') as file_text:
                     file_text.write(content)
-                    return files.name
+                    return file_path
+
         except AttributeError:
             pass
 
@@ -171,15 +178,13 @@ class FGuiMagic(GuiMagic):
         except:
             return None, None, None
 
-    def color(self, type_, regex, foreground_, background_):
+    def colorTheKeyWordInTextarea(self, type_, regex, foreground_, background_):
         try:
             self.textarea.tag_configure(
-                    type_, font=(self.font_active_now, 11, 'bold'),
+                    type_, font=(self.font_active_now, 14, 'bold'),
                     foreground=foreground_, background=background_
             )
-
             indices = self.textarea.findall(regex)
-
             self.textarea.tag_add(type_, *indices)
 
         except Exception as e:
@@ -188,22 +193,21 @@ class FGuiMagic(GuiMagic):
     def updateLineNumber(self):
         self.line_number.delete(0, 'end')
         line = len(self.textarea.get(1.0, 'end').split('\n'))
-        list = []
+        list_ = []
         for i in range(1, line):
             self.line_number.insert('end', str(i))
-            list.append(i)
-        self.line_number.config(width=len(str(max(list))))
+            list_.append(i)
+        self.line_number.config(width=len(str(max(list_))))
 
-    def groupFonction(self, event):
+    def updateTheLineNumberAndColorText(self, event: str) -> None:
         self.updateLineNumber()
-        self.color(*self.colorscheme.keyword)
-        self.color(*self.colorscheme.function)
-        self.color(*self.colorscheme.char)
-        self.color(*self.colorscheme.string)
-        self.color(*self.colorscheme.comment)
+        self.colorTheKeyWordInTextarea(*self.colorscheme.keyword)
+        self.colorTheKeyWordInTextarea(*self.colorscheme.function)
+        self.colorTheKeyWordInTextarea(*self.colorscheme.char)
+        self.colorTheKeyWordInTextarea(*self.colorscheme.string)
+        self.colorTheKeyWordInTextarea(*self.colorscheme.comment)
 
-    def change_colorsheme(self, title_colorschemes):
-        self.groupFonction('<KeyRelease>')
+    def changeColorscheme(self, title_colorschemes):
 
         self.colorscheme = Colorscheme(
                 f'{CURRENT_DIRECTORY}/plugin/colorshemes',
@@ -223,6 +227,8 @@ class FGuiMagic(GuiMagic):
                 bg=self.colorscheme.color['normal-background']
         )
 
+        self.updateTheLineNumberAndColorText('<KeyRelease>')
+
     def autoIndent(self, e):
         end_line = self.textarea.get('insert linestart', 'insert lineend')
         if len(end_line.strip("\t")):
@@ -240,5 +246,5 @@ class FGuiMagic(GuiMagic):
 
 
 if __name__ == "__main__":
-    fguimagic = FGuiMagic()
-    fguimagic.mainloop()
+    magic = MagicFonctionalityWithGui()
+    magic.mainloop()

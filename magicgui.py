@@ -17,7 +17,7 @@ CURRENT_DIRECTORY = os.path.abspath('.')
 
 customtkinter.set_appearance_mode("System")
 
-class GuiMagic(customtkinter.CTk):
+class MagicGui(customtkinter.CTk):
     def __init__(self):
         super().__init__()
         self.title('magic-text')
@@ -25,6 +25,8 @@ class GuiMagic(customtkinter.CTk):
         self.files_dictionary = {}
         self.file_active_now = None
         self.call('wm', 'iconphoto', self._w, PhotoImage(file=os.path.join(CURRENT_DIRECTORY, 'magic.png')))
+        self.font_active_now = 'mononoki'
+        self.font_size = 12
 
         self.colorscheme = Colorscheme(
             path=os.path.join(CURRENT_DIRECTORY, 'plugin/colorshemes'),
@@ -38,7 +40,8 @@ class GuiMagic(customtkinter.CTk):
 
         self.file_list = Listbox(
                 self.left_frame, bg=self.colorscheme.color['normal-background'],
-                fg=self.colorscheme.color['normal-foreground'], width=20, height=48
+                fg=self.colorscheme.color['normal-foreground'], width=20, height=48,
+                font=(self.font_active_now, self.font_size)
         )
 
         self.file_list.pack()
@@ -65,12 +68,11 @@ class GuiMagic(customtkinter.CTk):
                 maxundo=-1, fg=self.colorscheme.color['normal-foreground'],
                 bg=self.colorscheme.color['normal-background'], width=700,
                 height=31, insertbackground=self.colorscheme.color['cursor-foreground'],
-                font=('Courier New', 11),
+                font=(self.font_active_now, self.font_size),
                 yscrollcommand=self.yscrollbar.set
         )
         self.textarea.pack(side='left', fill='y')
 
-        self.font_active_now = 'Courier New'
         self.frame_bottom_right.pack(side='top', fill='y', expand=1)
 
         self.terminal = Text(self.right_frame, bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=('Courier New', 10))
@@ -101,5 +103,5 @@ class GuiMagic(customtkinter.CTk):
 
 
 if __name__ == "__main__":
-    guimagic = GuiMagic()
+    guimagic = MagicGui()
     guimagic.mainloop()
