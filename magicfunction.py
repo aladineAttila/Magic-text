@@ -25,7 +25,7 @@ class MagicFonctionalityWithGui(MagicGui):
         self.menu_font.add_command(label=self.font[1], command=lambda: self.changeFont(self.font[1]))
 
 
-        self.the_color = [color for color in self.colorscheme.colorschemes]
+        self.the_color = [color for color in self.colorscheme.colorscheme]
 
         self.menu_colorscheme.add_command(
                 label=self.the_color[0],
@@ -212,7 +212,7 @@ class MagicFonctionalityWithGui(MagicGui):
 
         self.colorscheme = Colorscheme(
                 path=f'{CURRENT_DIRECTORY}/plugin/colorshemes',
-                title_colorscheme=title
+                title_colorsheme = title
         )
         self.textarea.config(
                 fg=self.colorscheme.color['normal-foreground'],
