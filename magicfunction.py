@@ -1,4 +1,5 @@
 from magicgui import *
+from plugin.builder import build
 
 class MagicFonctionalityWithGui(MagicGui):
     def __init__(self):
@@ -28,19 +29,19 @@ class MagicFonctionalityWithGui(MagicGui):
 
         self.menu_colorscheme.add_command(
                 label=self.the_color[0],
-                command=lambda: self.changeColorscheme(self.the_color[0])
+                command=lambda: self.changeColorscheme(title=self.the_color[0])
         )
         self.menu_colorscheme.add_command(
                 label=self.the_color[1],
-                command=lambda: self.changeColorscheme(self.the_color[1])
+                command=lambda: self.changeColorscheme(title=self.the_color[1])
         )
         self.menu_colorscheme.add_command(
                 label=self.the_color[2],
-                command=lambda: self.changeColorscheme(self.the_color[2])
+                command=lambda: self.changeColorscheme(title=self.the_color[2])
         )
         self.menu_colorscheme.add_command(
                 label=self.the_color[3],
-                command=lambda: self.changeColorscheme(self.the_color[3])
+                command=lambda: self.changeColorscheme(title=self.the_color[3])
         )
 
         self.config(menu=self.menu, bg=MENU_BACKGROUND_COLOR)
@@ -158,7 +159,7 @@ class MagicFonctionalityWithGui(MagicGui):
                     code_file.write(code)
         else:
             file_path = self.saveFile(content=self.textarea.get(1.0, 'end'))
-        output = os.popen(f'python3 {file_path}').read()
+        output = build(file_path)
         self.terminal.delete(1.0, 'end')
         self.terminal.insert('end', output)
 
@@ -207,11 +208,11 @@ class MagicFonctionalityWithGui(MagicGui):
         self.colorTheKeyWordInTextarea(*self.colorscheme.string)
         self.colorTheKeyWordInTextarea(*self.colorscheme.comment)
 
-    def changeColorscheme(self, title_colorschemes):
+    def changeColorscheme(self, title: str) -> None:
 
         self.colorscheme = Colorscheme(
-                f'{CURRENT_DIRECTORY}/plugin/colorshemes',
-                title_colorschemes
+                path=f'{CURRENT_DIRECTORY}/plugin/colorshemes',
+                title_colorscheme=title
         )
         self.textarea.config(
                 fg=self.colorscheme.color['normal-foreground'],

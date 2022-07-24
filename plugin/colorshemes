@@ -101,7 +101,7 @@ context-background= #454545
 linenumber-foreground= gray
 linenumber-background= #002240
 
-[monokai]
+[Monokai]
 normal-foreground= #F8F8F2
 normal-background= #272822
 keyword-foreground= #F92672

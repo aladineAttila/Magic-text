@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 from dataclasses import dataclass
 
-def generateDict(themes):
-    themes = [elt.split('\n') for elt in themes.split("\n\n")]
-    dictionnairy = {}
-    title = ''
+def generateDict(themes: str) -> dict:
+    themes: list = [elt.split('\n') for elt in themes.split("\n\n")]
+    dictionnairy: dict = {}
+    title: str = ''
     for theme in themes:
-        dic = {}
+        tmp_dict: dict = {}
         for i, line in enumerate(theme):
             if i == 0:
                 title = line.strip('[]')
@@ -16,20 +16,21 @@ def generateDict(themes):
                     dic[key.strip(' ')] = value.strip(' ')
                 except ValueError:
                     pass
-        dictionnairy[title] = dic
+        dictionnairy[title] = tmp_dict
     return dictionnairy
 
 
-def readColorscheme(path):
+def readColorscheme(path: str) -> dict:
     with open(path, 'r') as colorschemes:
         themes = colorschemes.read()
         return generateDict(themes)
 
 
+@dataclass
 class Colorscheme:
-    def __init__(self, path, title_colorschemes):
-        self.colorschemes = readColorscheme(path)
-        self.color = self.colorschemes[title_colorschemes]
+    def __init__(self, path: str, title_colorscheme: str) -> None:
+        self.colorscheme = readColorscheme(path)
+        self.color = self.colorschemes[title_colorscheme]
 
         self.function = (
              'fonction',

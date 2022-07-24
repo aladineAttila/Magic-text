@@ -1,6 +1,8 @@
-# SUBLLIKE 
+# SUBLLIKE
 
 ## Install
+
+### Install custom tkinter
 
 ```bash
 python -m pip install cutsomtkinter
@@ -13,7 +15,7 @@ sudo apt-get install python-tk
 ## Run
 
 ```bash
-python sublLike.py
+python main.py
 ```
 
 ## Image
@@ -31,7 +33,7 @@ python sublLike.py
 
 Contributions, issues and feature requests are welcome!
 
-## Show your support 
+## Show your support
 
 Give a ⭐ if you like this project!
 
@@ -40,3 +42,4 @@ Give a ⭐ if you like this project!
 - auto indent
 - color scheme ( you can change theme )
 - build python code
+- terminal
