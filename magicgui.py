@@ -30,7 +30,7 @@ class MagicGui(customtkinter.CTk):
 
         self.colorscheme = Colorscheme(
             path=os.path.join(CURRENT_DIRECTORY, 'plugin/colorshemes'),
-            title_colorschemes='monokai'
+            title_colorscheme='Monokai'
         )
 
         self.main_frame = customtkinter.CTkFrame(self, bg=BACKGROUND_COLOR)
