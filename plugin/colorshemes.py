@@ -13,7 +13,7 @@ def generateDict(themes: str) -> dict:
             else:
                 try:
                     key, value = line.split("=")
-                    dic[key.strip(' ')] = value.strip(' ')
+                    tmp_dict[key.strip(' ')] = value.strip(' ')
                 except ValueError:
                     pass
         dictionnairy[title] = tmp_dict
@@ -30,7 +30,7 @@ def readColorscheme(path: str) -> dict:
 class Colorscheme:
     def __init__(self, path: str, title_colorscheme: str) -> None:
         self.colorscheme = readColorscheme(path)
-        self.color = self.colorschemes[title_colorscheme]
+        self.color = self.colorscheme[title_colorscheme]
 
         self.function = (
              'fonction',
