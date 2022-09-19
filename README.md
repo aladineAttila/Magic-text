@@ -1,4 +1,4 @@
-# SUBLLIKE
+# Magictext
 
 ## Install
 
