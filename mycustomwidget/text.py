@@ -8,10 +8,12 @@ class TextWithColorisation(Text):
 
     def findall(self, pattern, start='1.0', end='end'):
         v = self._variable
-        s = self.tk.call(self, 'search', '-all',
-                         '-count', v,
-                         '-regexp', pattern,
-                         start, end)
+        s = self.tk.call(
+            self, 'search', '-all',
+            '-count', v,
+            '-regexp', pattern,
+            start, end
+        )
 
         indices = []
         for a, b in zip(s, v.get()):

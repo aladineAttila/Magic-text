@@ -24,20 +24,19 @@ class MagicFonctionalityWithGui(MagicGui):
         self.menu_font.add_command(label=self.font[0], command=lambda: self.changeFont(self.font[0]))
         self.menu_font.add_command(label=self.font[1], command=lambda: self.changeFont(self.font[1]))
 
-
         self.the_color = [color for color in self.colorscheme.colorscheme]
 
         self.menu_colorscheme.add_command(
-                label=self.the_color[0],
-                command=lambda: self.changeColorscheme(title=self.the_color[0])
+            label=self.the_color[0],
+            command=lambda: self.changeColorscheme(title=self.the_color[0])
         )
         self.menu_colorscheme.add_command(
-                label=self.the_color[1],
-                command=lambda: self.changeColorscheme(title=self.the_color[1])
+            label=self.the_color[1],
+            command=lambda: self.changeColorscheme(title=self.the_color[1])
         )
         self.menu_colorscheme.add_command(
-                label=self.the_color[2],
-                command=lambda: self.changeColorscheme(title=self.the_color[2])
+            label=self.the_color[2],
+            command=lambda: self.changeColorscheme(title=self.the_color[2])
         )
         self.menu_colorscheme.add_command(
                 label=self.the_color[3],
@@ -121,13 +120,13 @@ class MagicFonctionalityWithGui(MagicGui):
                 self.textarea.insert('end', content)
                 self.updateTheLineNumberAndColorText('<KeyRelease>')
                 button = customtkinter.CTkButton(
-                       self.frame_top_right,
-                       text=name,
-                       fg_color=("#272822", "#272822"),
-                       command=lambda: (self.activeFile(self.files_dictionary[name])),
-                       width=15
-               )\
-               .pack(side='left', ipady=4, ipadx=10)
+                    self.frame_top_right,
+                    text=name,
+                    fg_color=self.colorscheme.color['normal-foreground'],
+                    command=lambda: (self.activeFile(self.files_dictionary[name])),
+                    width=15
+                )
+                button.pack(side='left', ipady=4, ipadx=10)
 
     def ctrlS(self, event: str) -> None:
         self.saveFile(self.textarea.get(1.0, 'end'), self.file_active_now)
@@ -142,7 +141,6 @@ class MagicFonctionalityWithGui(MagicGui):
                     name_of_file = file_path.split('/')[-1]
                     self.insertContentOnTextarea(name_of_file, content, file_path)
                     return file_path
-
             else:
                 with open(f"{file_path}", 'w') as file_text:
                     file_text.write(content)
@@ -153,10 +151,9 @@ class MagicFonctionalityWithGui(MagicGui):
 
     def build(self, file_path: str, mode: str=None) -> None:
         code = self.textarea.get(1.0, 'end')
-        if file_path:
-            if mode == "buildAndWrite":
-                with open(file_path, 'w') as code_file:
-                    code_file.write(code)
+        if file_path and mode == "buildAndWrite":
+            with open(file_path, 'w') as code_file:
+                code_file.write(code)
         else:
             file_path = self.saveFile(content=self.textarea.get(1.0, 'end'))
         output = build(file_path)
@@ -166,8 +163,8 @@ class MagicFonctionalityWithGui(MagicGui):
     def openFile(self) -> tuple:
         try:
             files = filedialog.askopenfiles(
-                    title='select file to open on magic-text',
-                    mode='rb'
+                title='select file to open on magic-text',
+                mode='rb'
             )
             os.chdir('/'.join(files[0].name.split('/')[:-1]))
             for file_ in files:
@@ -182,8 +179,8 @@ class MagicFonctionalityWithGui(MagicGui):
     def colorTheKeyWordInTextarea(self, type_, regex, foreground_, background_):
         try:
             self.textarea.tag_configure(
-                    type_, font=(self.font_active_now, 14, 'bold'),
-                    foreground=foreground_, background=background_
+                type_, font=(self.font_active_now, self.font_size),
+                foreground=foreground_, background=background_
             )
             indices = self.textarea.findall(regex)
             self.textarea.tag_add(type_, *indices)
@@ -194,38 +191,43 @@ class MagicFonctionalityWithGui(MagicGui):
     def updateLineNumber(self):
         self.line_number.delete(0, 'end')
         line = len(self.textarea.get(1.0, 'end').split('\n'))
-        list_ = []
+        list_line = []
         for i in range(1, line):
             self.line_number.insert('end', str(i))
-            list_.append(i)
-        self.line_number.config(width=len(str(max(list_))))
+            list_line.append(i)
+        self.line_number.config(width=len(str(max(list_line))))
 
     def updateTheLineNumberAndColorText(self, event: str) -> None:
         self.updateLineNumber()
         self.colorTheKeyWordInTextarea(*self.colorscheme.keyword)
         self.colorTheKeyWordInTextarea(*self.colorscheme.function)
         self.colorTheKeyWordInTextarea(*self.colorscheme.char)
-        self.colorTheKeyWordInTextarea(*self.colorscheme.string)
         self.colorTheKeyWordInTextarea(*self.colorscheme.comment)
+        self.colorTheKeyWordInTextarea(*self.colorscheme.string)
 
     def changeColorscheme(self, title: str) -> None:
 
         self.colorscheme = Colorscheme(
-                path=f'{CURRENT_DIRECTORY}/plugin/colorshemes',
-                title_colorsheme = title
+            path=f'{CURRENT_DIRECTORY}/plugin/colorshemes',
+            title_colorscheme = title
         )
         self.textarea.config(
-                fg=self.colorscheme.color['normal-foreground'],
-                bg=self.colorscheme.color['normal-background'],
-                insertbackground=self.colorscheme.color['cursor-foreground']
+            fg=self.colorscheme.color['normal-foreground'],
+            bg=self.colorscheme.color['normal-background'],
+            insertbackground=self.colorscheme.color['cursor-foreground']
         )
         self.line_number.config(
-                fg=self.colorscheme.color['linenumber-foreground'],
-                bg=self.colorscheme.color['linenumber-background']
+            fg=self.colorscheme.color['linenumber-foreground'],
+            bg=self.colorscheme.color['linenumber-background']
         )
         self.file_list.config(
-                fg=self.colorscheme.color['normal-foreground'],
-                bg=self.colorscheme.color['normal-background']
+            fg=self.colorscheme.color['normal-foreground'],
+            bg=self.colorscheme.color['normal-background']
+        )
+
+        self.terminal.config(
+            fg=self.colorscheme.color['normal-foreground'],
+            bg=self.colorscheme.color['normal-background'],
         )
 
         self.updateTheLineNumberAndColorText('<KeyRelease>')
@@ -235,10 +237,10 @@ class MagicFonctionalityWithGui(MagicGui):
         if len(end_line.strip("\t")):
             tab = len([t for t in end_line.split('\t') if t == ''])
             try:
-                if end_line[-1] == ':':
-                    self.textarea.insert('insert', "\n" + "\t" * (tab + 1))
+                if end_line[-1] in [":", "{"]:
+                    self.textarea.insert('insert', "\n" + "    " * (tab + 1))
                 else:
-                    self.textarea.insert('insert', "\n" + "\t" * tab)
+                    self.textarea.insert('insert', "\n" + "    " * tab)
                 return 'break'
             except IndexError:
                 pass

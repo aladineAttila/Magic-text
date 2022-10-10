@@ -24,9 +24,11 @@ class MagicGui(customtkinter.CTk):
         self.geometry("1000x800")
         self.files_dictionary = {}
         self.file_active_now = None
-        self.call('wm', 'iconphoto', self._w, PhotoImage(file=os.path.join(CURRENT_DIRECTORY, 'magic.png')))
+        self.call('wm', 'iconphoto', self._w,
+            PhotoImage(file=os.path.join(CURRENT_DIRECTORY, 'magic.png'))
+        )
         self.font_active_now = 'mononoki'
-        self.font_size = 12
+        self.font_size = 11
 
         self.colorscheme = Colorscheme(
             path=os.path.join(CURRENT_DIRECTORY, 'plugin/colorshemes'),
@@ -36,12 +38,18 @@ class MagicGui(customtkinter.CTk):
         self.main_frame = customtkinter.CTkFrame(self, bg=BACKGROUND_COLOR)
 
         self.left_frame = customtkinter.CTkFrame(self.main_frame, bg=BACKGROUND_COLOR, height=0)
-        self.enthete = customtkinter.CTkLabel(self.left_frame, bg=BACKGROUND_COLOR, fg='#9E9F9B', text='').pack(ipady=7)
+        self.enthete = customtkinter.CTkLabel(
+            self.left_frame,
+            bg=BACKGROUND_COLOR,
+            fg='#9E9F9B',
+            text=''
+        )
+        self.enthete.pack(ipady=7)
 
         self.file_list = Listbox(
-                self.left_frame, bg=self.colorscheme.color['normal-background'],
-                fg=self.colorscheme.color['normal-foreground'], width=20, height=48,
-                font=(self.font_active_now, self.font_size)
+            self.left_frame, bg=self.colorscheme.color['normal-background'],
+            fg=self.colorscheme.color['normal-foreground'], width=20, height=48,
+            font=(self.font_active_now, self.font_size)
         )
 
         self.file_list.pack()
@@ -64,12 +72,17 @@ class MagicGui(customtkinter.CTk):
         )
         self.line_number.pack(side='left', fill='y')
         self.textarea = TextWithColorisation(
-                self.frame_bottom_right, undo=True, autoseparators=True,
-                maxundo=-1, fg=self.colorscheme.color['normal-foreground'],
-                bg=self.colorscheme.color['normal-background'], width=700,
-                height=31, insertbackground=self.colorscheme.color['cursor-foreground'],
-                font=(self.font_active_now, self.font_size),
-                yscrollcommand=self.yscrollbar.set
+            self.frame_bottom_right,
+            width=700,
+            height=31,
+            maxundo=-1,
+            undo=True,
+            autoseparators=True,
+            fg=self.colorscheme.color['normal-foreground'],
+            bg=self.colorscheme.color['normal-background'],
+            insertbackground=self.colorscheme.color['cursor-foreground'],
+            font=(self.font_active_now, self.font_size),
+            yscrollcommand=self.yscrollbar.set
         )
         self.textarea.pack(side='left', fill='y')
 
