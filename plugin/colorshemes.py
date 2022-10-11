@@ -32,37 +32,47 @@ class Colorscheme:
         self.colorscheme = readColorscheme(path)
         self.color = self.colorscheme[title_colorscheme]
 
-        self.function = (
-             'fonction',
-             r'(\w+)(?=\s?\()',
-             self.color['definition-foreground'],
-             self.color['definition-background']
-         )
+        self.dict_color = {
+            "function": (
+                'fonction',
+                r'(\w+)(?=\s?\()',
+                self.color['definition-foreground'],
+                self.color['definition-background']
+            ),
 
-        self.keyword = (
-            'keyword',
-            r'(if |elif |else:|def |for |while |try:|except|class|from |import | as | in |return )',
-            self.color['keyword-foreground'],
-            self.color['keyword-background']
-        )
+            "keyword" : (
+                'keyword',
+                r'(if |elif |else:|def |for |while |try:|except|class|from |import | as | in |return )',
+                self.color['keyword-foreground'],
+                self.color['keyword-background']
+            ),
 
-        self.comment = (
-            'comment',
-            r'(#.+|""".+""")',
-            self.color['comment-foreground'],
-            self.color['comment-background']
-        )
+            "digit" : (
+                'digit',
+                r'(\d+)',
+                self.color['keyword-foreground'],
+                self.color['keyword-background']
+            ),
 
-        self.char = (
-            'char',
-            r'(\'.+\')',
-            self.color['string-foreground'],
-            self.color['string-background']
-        )
+            "char" : (
+                'char',
+                r'(\'.+\')',
+                self.color['string-foreground'],
+                self.color['string-background']
+            ),
 
-        self.string = (
-            'string', r'(".+")',
-            self.color['string-foreground'],
-            self.color['string-background']
-        )
+            "comment" : (
+                'comment',
+                r'(#.+|""".+""")',
+                self.color['comment-foreground'],
+                self.color['comment-background']
+            ),
 
+            "string" : (
+                'string', 
+                r'(".+")',
+                self.color['string-foreground'],
+                self.color['string-background']
+            ),
+            
+        }
