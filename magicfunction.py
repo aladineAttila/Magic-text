@@ -68,24 +68,6 @@ class MagicFonctionalityWithGui(MagicGui):
         except:
             pass
 
-    def hideAndShowTerminal(self, mode):
-        try:
-            if mode == "show":
-                self.term_mod = 'hide'
-                self.terminal.pack(side='bottom', fill='x', ipady=5)
-            elif mode == "hide":
-                self.term_mod = 'show'
-                self.terminal.forget()
-        except:
-            pass
-
-    def ctrlB(self, event: str) -> None:
-        self.hideAndShowTerminal('show')
-        try:
-            self.build(self.files_dictionary[self.file_active_now], 'buildAndWrite')
-        except:
-            self.build(None, 'buildAndWrite')
-
     def fillOut(self, event: str) -> None:
         try:
             self.activeFile(self.files_dictionary[self.file_list.get('active')])
@@ -108,7 +90,7 @@ class MagicFonctionalityWithGui(MagicGui):
             self.title(f'{directory} - magic-text')
         self.updateTheLineNumberAndColorText('<KeyRelease>')
 
-    def insertContentOnTextarea(self, name: str=None, content: str=None, directory: str=None) -> None:
+    def insertContentOnTextarea(self, name: str = None, content: str = None, directory: str = None) -> None:
         name, content, directory = self.openFile()
         if name and content and directory:
             self.file_active_now = name
@@ -128,9 +110,6 @@ class MagicFonctionalityWithGui(MagicGui):
                 )
                 button.pack(side='left', ipady=4, ipadx=10)
 
-    def ctrlS(self, event: str) -> None:
-        self.saveFile(self.textarea.get(1.0, 'end'), self.file_active_now)
-
     def saveFile(self, content: str, file_path: str=None) -> str:
         try:
             if file_path is None:
@@ -149,6 +128,20 @@ class MagicFonctionalityWithGui(MagicGui):
         except AttributeError:
             pass
 
+    def ctrlS(self, event: str) -> None:
+        self.saveFile(self.textarea.get(1.0, 'end'), self.file_active_now)
+
+    def hideAndShowTerminal(self, mode):
+        try:
+            if mode == "show":
+                self.term_mod = 'hide'
+                self.terminal.pack(side='bottom', fill='x', ipady=5)
+            elif mode == "hide":
+                self.term_mod = 'show'
+                self.terminal.forget()
+        except:
+            pass
+
     def build(self, file_path: str, mode: str=None) -> None:
         code = self.textarea.get(1.0, 'end')
         if file_path and mode == "buildAndWrite":
@@ -160,7 +153,14 @@ class MagicFonctionalityWithGui(MagicGui):
         self.terminal.delete(1.0, 'end')
         self.terminal.insert('end', output)
 
-    def openFile(self) -> tuple:
+    def ctrlB(self, event: str) -> None:
+        self.hideAndShowTerminal('show')
+        try:
+            self.build(self.files_dictionary[self.file_active_now], 'buildAndWrite')
+        except:
+            self.build(None, 'buildAndWrite')
+
+    def openFile(self) -> tuple[str|None]:
         try:
             files = filedialog.askopenfiles(
                 title='select file to open on magic-text',
@@ -176,11 +176,13 @@ class MagicFonctionalityWithGui(MagicGui):
         except:
             return None, None, None
 
-    def colorTheKeyWordInTextarea(self, type_, regex, foreground_, background_):
+    def colorTheKeyWordInTextarea(self, type_, regex, foreground, background):
         try:
             self.textarea.tag_configure(
-                type_, font=(self.font_active_now, self.font_size),
-                foreground=foreground_, background=background_
+                type_,
+                font=(self.font_active_now, self.font_size),
+                foreground=foreground,
+                background=background
             )
             indices = self.textarea.findall(regex)
             self.textarea.tag_add(type_, *indices)
@@ -206,7 +208,6 @@ class MagicFonctionalityWithGui(MagicGui):
         self.colorTheKeyWordInTextarea(*self.colorscheme.string)
 
     def changeColorscheme(self, title: str) -> None:
-
         self.colorscheme = Colorscheme(
             path=f'{CURRENT_DIRECTORY}/plugin/colorshemes',
             title_colorscheme = title
@@ -224,7 +225,6 @@ class MagicFonctionalityWithGui(MagicGui):
             fg=self.colorscheme.color['normal-foreground'],
             bg=self.colorscheme.color['normal-background']
         )
-
         self.terminal.config(
             fg=self.colorscheme.color['normal-foreground'],
             bg=self.colorscheme.color['normal-background'],
