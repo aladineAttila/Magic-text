@@ -12,7 +12,7 @@ file_map = {
     "c": "gcc {0} -o {1} && ./{1}",
 }
 
-def build(file_path):
+def build(file_path: str) -> str:
     file = file_path.split(".")
     if len(file) == 2 and os.path.exists(os.path.join(current_directory, file_path)):
         name, ext = file
@@ -20,7 +20,7 @@ def build(file_path):
         if ext == "py":
             return os.popen(command.format(file_path)).read()
         elif ext == "rs":
-            os.popen(command)
+            return os.popen(command)
         elif ext == "cpp" or ext == "c":
             return os.popen(command.format(file_path, name)).read()
         else:

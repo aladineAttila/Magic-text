@@ -5,7 +5,11 @@
 ### Install custom tkinter
 
 ```bash
-python -m pip install cutsomtkinter
+python -m pip install customtkinter
+```
+##### or
+```bash
+python -m pip installl -r requirement.txt
 ```
 #### if tkinter is not install
 
@@ -20,8 +24,9 @@ python main.py
 
 ## Image
 
-![change colorscheme](image/change-colorscheme.png)
-![monokai](image/monokai.png)
+![monokai](image/Screenshot%20from%202022-10-11%2010-09-11.png)
+![light-mode](image/Screenshot%20from%202022-10-11%2010-09-35.png)
+![dark-mode](image/Screenshot%20from%202022-10-11%2010-10-53.png)
 
 ## Author
 
