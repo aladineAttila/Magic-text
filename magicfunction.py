@@ -201,11 +201,8 @@ class MagicFonctionalityWithGui(MagicGui):
 
     def updateTheLineNumberAndColorText(self, event: str) -> None:
         self.updateLineNumber()
-        self.colorTheKeyWordInTextarea(*self.colorscheme.keyword)
-        self.colorTheKeyWordInTextarea(*self.colorscheme.function)
-        self.colorTheKeyWordInTextarea(*self.colorscheme.char)
-        self.colorTheKeyWordInTextarea(*self.colorscheme.comment)
-        self.colorTheKeyWordInTextarea(*self.colorscheme.string)
+        for key_color in self.colorscheme.list_color:
+            self.colorTheKeyWordInTextarea(*self.colorscheme.dict_color[key_color])
 
     def changeColorscheme(self, title: str) -> None:
         self.colorscheme = Colorscheme(
@@ -232,15 +229,15 @@ class MagicFonctionalityWithGui(MagicGui):
 
         self.updateTheLineNumberAndColorText('<KeyRelease>')
 
-    def autoIndent(self, e):
+    def autoIndent(self, e) -> str:
         end_line = self.textarea.get('insert linestart', 'insert lineend')
         if len(end_line.strip("\t")):
-            tab = len([t for t in end_line.split('\t') if t == ''])
+            tab_size = len([t for t in end_line.split('    ') if t == ''])
             try:
                 if end_line[-1] in [":", "{"]:
-                    self.textarea.insert('insert', "\n" + "    " * (tab + 1))
+                    self.textarea.insert('insert', "\n" + "    " * (tab_size + 1))
                 else:
-                    self.textarea.insert('insert', "\n" + "    " * tab)
+                    self.textarea.insert('insert', "\n" + "    " * tab_size)
                 return 'break'
             except IndexError:
                 pass
