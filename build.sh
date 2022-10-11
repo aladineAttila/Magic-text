@@ -3,19 +3,18 @@
 DIRECTORY=
 ASSETS=
 
-
 createWorkSpace(){
 	mkdir build -p
 	cd build
 }
 
 buildProjet(){
-	pyinstaller magic/sublLike.py
+	pyinstaller ../main.py
 }
 
 initGlobalVariable(){
 	DIRECTORY=$(pwd)
-	ASSETS="$DIRECTORY/dist/sublLike/customtkinter"
+	ASSETS="$DIRECTORY/dist/main/customtkinter/"
 }
 
 creatAssestDirectory(){
@@ -24,7 +23,7 @@ creatAssestDirectory(){
 }
 
 copyAssetsFileFromLib(){
-	cp "/usr/local/lib/python3.8/dist-packages/customtkinter/assets" -r "$ASSETS"
+	sudo cp -r /usr/local/lib/python3*/dist-packages/customtkinter/assets $ASSETS
 	echo "assets file have been copied succesfully"
 }
 
