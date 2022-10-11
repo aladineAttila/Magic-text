@@ -5,21 +5,28 @@
 ### Install custom tkinter
 
 ```bash
-python -m pip install customtkinter
+sudo python -m pip installl -r requirement.txt
 ```
-##### or
-```bash
-python -m pip installl -r requirement.txt
-```
+
 #### if tkinter is not install
 
 ```bash
 sudo apt-get install python-tk
 ```
-## Run
+## Run python code
 
 ```bash
 python main.py
+```
+
+## build and run
+```bash
+./build.sh
+```
+### Run binary
+
+```bash
+./build/dist/main/main
 ```
 
 ## Image
