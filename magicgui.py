@@ -40,8 +40,8 @@ class MagicGui(customtkinter.CTk):
         self.left_frame = customtkinter.CTkFrame(self.main_frame, bg=BACKGROUND_COLOR, height=0)
         self.enthete = customtkinter.CTkLabel(
             self.left_frame,
-            bg=BACKGROUND_COLOR,
-            fg='#9E9F9B',
+            bg=self.colorscheme.color['normal-background'],
+            fg=self.colorscheme.color['normal-foreground'],
             text=''
         )
         self.enthete.pack(ipady=7)
