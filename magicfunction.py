@@ -145,11 +145,10 @@ class MagicFonctionalityWithGui(MagicGui):
                     file_text.write(content)
                     name_of_file = file_path.split("/")[-1]
                     self.insertContentOnTextarea(name_of_file, content, file_path)
-                    return file_path
             else:
                 with open(f"{file_path}", "w") as file_text:
                     file_text.write(content)
-                    return file_path
+            return file_path
 
         except AttributeError:
             pass

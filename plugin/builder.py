@@ -1,6 +1,4 @@
-
 #!/usr/bin/env python3
-import argparse
 import os
 
 current_directory = os.path.abspath(".")
@@ -11,6 +9,7 @@ file_map = {
     "cpp": "g++ {0} -o {1} && ./{1}",
     "c": "gcc {0} -o {1} && ./{1}",
 }
+
 
 def build(file_path: str) -> str:
     file = file_path.split(".")
@@ -27,4 +26,3 @@ def build(file_path: str) -> str:
             return "this programme can't compile or run this file"
     else:
         return "file not found"
-
